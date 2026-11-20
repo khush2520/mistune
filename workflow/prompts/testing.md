@@ -1,3 +1,4 @@
 Write behavior-focused pytest tests demonstrating the spec against the candidate. Cover every criterion. Use deterministic inputs, meaningful assertions, and public entry points where possible. You may only create or replace tests/test_autose_*.py. Keep existing baseline tests intact. You may update previously generated AutoSE tests. Each criterion needs an executable top-level test name: AC-01 uses test_ac_01 or test_ac_01_<description>. The runner will check the names and use reported execution results.
 
-Return JSON with files as an object mapping test file paths to complete file text. Return an empty files object when the existing AutoSE tests already cover every current criterion.
+Return JSON with edits, an array of {path, old, new}. For a brand new file use old="" and put the complete Python test file in new. For an existing AutoSE test file, old must uniquely match the exact text to replace and new is the replacement text. Use an empty edits array only when the current AutoSE tests cover every criterion.
+For subprocess CLI tests, pass the current repository's src directory via PYTHONPATH if changing working directory.

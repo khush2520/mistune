@@ -102,6 +102,30 @@ def design(data, repo, index, directory):
 
 def apply_files(repo, result, pattern, allowed=None):
     files = result.get("files")
+    if "edits" in result:
+        files = {}
+        for edit in objects(result["edits"], "edits", maximum=8):
+            name = string(edit.get("path"), "edit path", 150)
+            if not pattern.fullmatch(name) or (allowed is not None and name not in allowed):
+                raise Stop("A model proposed an edit outside this stage's allowlist.")
+            target = safe_path(repo, name)
+            old, new = edit.get("old"), edit.get("new")
+            if not isinstance(old, str) or not isinstance(new, str):
+                raise Stop("Each edit needs old and new text.")
+            if name in files:
+                current = files[name]
+            elif target.is_file():
+                current = target.read_text(encoding="utf-8")
+            else:
+                current = ""
+            if old:
+                if current.count(old) != 1:
+                    raise Stop(f"Replacement text for {name} must match exactly once.")
+                files[name] = current.replace(old, new, 1)
+            elif current or target.exists():
+                raise Stop(f"An empty edit anchor cannot replace existing file {name}.")
+            else:
+                files[name] = new
     if not isinstance(files, dict) or len(files) > 8:
         raise Stop("The files response needs an object with at most eight file entries.")
     for name, content in files.items():
@@ -180,7 +204,7 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
         for attempt in (1, 2):
             stage = "Implementation"
             try:
-                source = read_files(repo, [*sorted(allowed), *plan["context"]])
+                source = read_files(repo, [*sorted(allowed), *plan["context"]], limit=26_000)
                 if any((repo / path).exists() and path not in source for path in allowed):
                     raise Stop("A target file exceeded the implementation context limit.")
                 result = model.ask("implementation", {
@@ -198,7 +222,7 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                 test_names = [p.relative_to(repo).as_posix() for p in (repo / "tests").glob("test_autose_*.py")]
                 result = model.ask("testing", {
                     "spec": spec, "design": plan, "previous_failure": feedback,
-                    "current_sources": read_files(repo, sorted(allowed), limit=62_000),
+                    "current_sources": read_files(repo, sorted(allowed), limit=21_000),
                     "current_tests": read_files(repo, test_names, limit=12_000),
                 })
                 apply_files(repo, result, TEST)

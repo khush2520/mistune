@@ -15,6 +15,20 @@ permissions:
   contents: read
 
 jobs:
+  dispatch-issue:
+    if: >-
+      github.repository == vars.AUTOSE_FORK &&
+      !startsWith(github.ref, 'refs/heads/autose/issue-') &&
+      inputs.base == 'issue'
+    permissions:
+      contents: write
+      issues: read
+      pull-requests: write
+      actions: write
+    uses: ./.github/workflows/autose.yml
+    with:
+      issue_number: ${{ inputs.label }}
+
   verify:
     if: startsWith(github.ref, 'refs/heads/autose/issue-') && github.repository == vars.AUTOSE_FORK
     runs-on: ubuntu-latest

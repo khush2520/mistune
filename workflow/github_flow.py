@@ -17,8 +17,12 @@ def authorize(directory):
         raise Stop("Set AUTOSE_FORK to the full name of the assignment fork.")
     event = load(Path(os.environ["GITHUB_EVENT_PATH"]))
     event_name = os.environ["GITHUB_EVENT_NAME"]
-    if not ((event_name == "issues" and event.get("label", {}).get("name") == "autose")
-            or (event_name == "issue_comment" and event.get("comment", {}).get("body") == "/autose")):
+    manual_issue = os.environ.get("AUTOSE_DISPATCH_ISSUE", "")
+    if manual_issue:
+        if event_name != "workflow_dispatch" or not re.fullmatch(r"[1-9][0-9]{0,7}", manual_issue):
+            raise Stop("Manual dispatch needs a valid GitHub issue number.")
+    elif not ((event_name == "issues" and event.get("label", {}).get("name") == "autose")
+              or (event_name == "issue_comment" and event.get("comment", {}).get("body") == "/autose")):
         raise Stop("Use the autose label or the exact /autose comment.")
     repo = github("")
     parent = repo.get("parent") or {}
@@ -29,7 +33,7 @@ def authorize(directory):
         membership = github(f"/collaborators/{quote(login, safe='')}/permission")
         if membership["permission"] not in {"write", "maintain", "admin"}:
             raise Stop("The issue sender and rerun actor need repository write access.")
-    issue = event["issue"]
+    issue = github(f"/issues/{manual_issue}") if manual_issue else event["issue"]
     if issue.get("pull_request") or issue["state"] != "open":
         raise Stop("The trigger needs an open issue.")
     title = issue.get("title") or ""
@@ -37,13 +41,15 @@ def authorize(directory):
     if len(body.encode()) > 12_000:
         raise Stop("The issue description exceeds the 12 KB intake limit.")
     dump(directory / "issue.json", {"number": issue["number"], "title": title, "body": body})
-    base = os.environ["GITHUB_SHA"]
-    if github("/git/ref/heads/main")["object"]["sha"] != base:
+    main = github("/git/ref/heads/main")["object"]["sha"]
+    control = os.environ["GITHUB_SHA"]
+    base = main if manual_issue else control
+    if main != base:
         raise Stop("Main moved after intake; start a new run from the issue.")
     run_id = os.environ["GITHUB_RUN_ID"]
     attempt = os.environ["GITHUB_RUN_ATTEMPT"]
     branch = f"autose/issue-{issue['number']}-{run_id}-{attempt}"
-    output(base=base, branch=branch, issue=issue["number"], intake=f"intake-{attempt}")
+    output(base=base, control=control, branch=branch, issue=issue["number"], intake=f"intake-{attempt}")
 
 
 def existing_ref(branch):

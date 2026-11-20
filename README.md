@@ -9,14 +9,14 @@ This assignment uses [khush2520/mistune](https://github.com/khush2520/mistune). 
 3. Open the [Actions tab](https://github.com/khush2520/mistune/actions/workflows/autose.yml). Start with `spec.md`, then check `design.md`, `diff.patch` and `test_report.md`. If release succeeds, `pr.md` links to the PR and the CI run that checked its commit.
 4. Read the independent review on the PR. Requests for changes can send the job back to design or implementation once. The final decision belongs to a maintainer.
 
-The default model for each role is `gpt-5.4-mini-2026-03-17`, with low reasoning effort. Each role starts a fresh request. Set `AUTOSE_MODEL` only if you need a different compatible snapshot. Each build and review artifact has `usage.json` with provider-reported token counts.
+The workflow now runs Qwen2.5-Coder-7B-Instruct locally on the standard Actions runner. The pinned Q4_K_M weights are public and the runner binds llama.cpp to loopback. No model API key or paid inference fallback is needed. Each model step writes the prompt and completion token counts to `usage.json`. [Model card](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF) · [Public Actions runner billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
 
 ## Settings for a fresh fork
 
-1. Enable Issues and Actions. Set the repository Actions variable `AUTOSE_FORK` to the full `owner/repository` name.
-2. Set an enforced spending limit in the OpenAI project that will pay for the runs. Create a key for that project and save it as the repository Actions secret `OPENAI_API_KEY`. [OpenAI project limits](https://help.openai.com/en/articles/9186755-managing-projects-in-the-api-platform) · [GitHub Actions secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets)
-3. In **Settings → Actions → General**, enable **Allow GitHub Actions to create and approve pull requests**. AutoSE records its verdict as a GitHub review comment on the exact commit. Protect `main` by requiring pull requests and enforce protection for administrators. [Actions permissions](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository)
-4. Create the `autose` label. The workflow needs to be on the default branch for issue and comment triggers.
+1. Enable Issues and Actions. Set the repository Actions variable `AUTOSE_FORK` to the full `owner/repository` name. Keep the repository public so the standard hosted runners are free.
+2. In **Settings → Actions → General**, enable **Allow GitHub Actions to create and approve pull requests**. AutoSE records its verdict as a GitHub review comment on the exact commit. Require pull requests for `main` and enforce protection for administrators. [Actions permissions](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository)
+3. Create the `autose` label. Issue and comment triggers use the workflow on the default branch.
+4. To test a workflow revision on the protected fork before it lands, dispatch **AutoSE CI** on the evidence branch with `base=issue` and `label` set to the issue number. This runs the same controller using the evidence branch's workflow and the current protected `main` as the product base.
 
 ## Read the evidence
 
@@ -33,7 +33,7 @@ docker build -t autose-checks:local workflow
 python3 experiment/measure.py /tmp/autose-results
 ```
 
-Use a fresh output directory. These probes use scripted model responses, which makes the checks repeatable and avoids API charges. The independent reviewer in the hosted flow receives the issue, diff and files from the released commit. It can run the fixed build and full test suite in the same isolation as CI.
+Use a fresh output directory. These probes use scripted model responses, which makes the checks repeatable. The independent reviewer in the hosted flow receives the issue, diff and files from the released commit. It can run the fixed build and full test suite in the same isolation as CI.
 
 ## AI assistance
 
