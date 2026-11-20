@@ -24,6 +24,7 @@ The default model for each role is `gpt-5.4-mini-2026-03-17`, with low reasoning
 - [Architecture](architecture/views/components.md), [sequence](architecture/views/sequence.md), [stage map](architecture/views/stage-map.md) and [decisions](architecture/decisions/)
 - [Issue texts](experiment/issues/), [seeded cases](experiment/seeded_prs/) and [experiment variants](experiment/variants.md)
 - [Run ledger](results/runs.md) and [measured local results](results/results.csv)
+- [Local verification video](demo-local.mp4) shows issue F1 and the recorded Docker probe. The hosted demo needs a live posted review.
 
 Repeat the local decision probes with Docker running.
 
