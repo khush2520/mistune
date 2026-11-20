@@ -1,0 +1,11 @@
+--- a/src/mistune/__main__.py
++++ b/src/mistune/__main__.py
+@@ -34,7 +34,7 @@
+ 
+ 
+ def _output(text: str, args: argparse.Namespace) -> None:
+-    if args.output:
++    if args.output and args.output != "-":
+         with open(args.output, "w", encoding="utf-8") as f:
+             f.write(text)
+     else:

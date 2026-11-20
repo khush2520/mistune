@@ -1,0 +1,5 @@
+{
+  "verdict": "approve",
+  "summary": "The guard clause preserves both code paths.",
+  "findings": []
+}

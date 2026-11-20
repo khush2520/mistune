@@ -1,0 +1,32 @@
+diff --git a/src/mistune/__main__.py b/src/mistune/__main__.py
+index 9cd4ed0..26e3b4d 100644
+--- a/src/mistune/__main__.py
++++ b/src/mistune/__main__.py
+@@ -34,7 +34,7 @@ def _md(args: argparse.Namespace) -> "Markdown":
+ 
+ 
+ def _output(text: str, args: argparse.Namespace) -> None:
+-    if args.output:
++    if args.output and args.output != "-":
+         with open(args.output, "w", encoding="utf-8") as f:
+             f.write(text)
+     else:
+diff --git a/tests/test_autose_probe.py b/tests/test_autose_probe.py
+new file mode 100644
+index 0000000..cbfc0f3
+--- /dev/null
++++ b/tests/test_autose_probe.py
+@@ -0,0 +1,13 @@
++import subprocess
++import sys
++from pathlib import Path
++
++
++def test_ac_01(tmp_path, monkeypatch):
++    dash = tmp_path / "-"
++    dash.write_text("keep")
++    monkeypatch.setenv("PYTHONPATH", str(Path(__file__).resolve().parents[1] / "src"))
++    command = [sys.executable, "-m", "mistune", "-m", "Hi", "--output", "-"]
++    result = subprocess.run(command, cwd=tmp_path, text=True, capture_output=True, check=True)
++    assert result.stdout == "<p>Hi</p>\n\n"
++    assert dash.read_text() == "keep"

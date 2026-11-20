@@ -1,0 +1,12 @@
+{
+  "verdict": "request_changes",
+  "summary": "An unrelated CLI case regressed.",
+  "findings": [
+    {
+      "path": "src/mistune/__main__.py",
+      "line": 9999,
+      "problem": "Empty stdin now succeeds.",
+      "return_to": "implementation"
+    }
+  ]
+}

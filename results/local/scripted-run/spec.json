@@ -1,0 +1,28 @@
+{
+  "status": "ready",
+  "summary": "Let me send CLI output to stdout with --output -",
+  "actors": [
+    "CLI user"
+  ],
+  "constraints": [],
+  "assumptions": [],
+  "questions": [],
+  "criteria": [
+    {
+      "id": "AC-01",
+      "requirement": "FR-01",
+      "provenance": "confirmed",
+      "evidence": "Issue output flags",
+      "given": "A file named dash exists",
+      "when": "Render to --output -",
+      "then": "Send the usual HTML to stdout and preserve the file named dash."
+    }
+  ],
+  "checks": {
+    "feasibility": true,
+    "consistency": true,
+    "completeness": true,
+    "testability": true,
+    "traceability": true
+  }
+}

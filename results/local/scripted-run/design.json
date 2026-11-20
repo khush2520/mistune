@@ -1,0 +1,16 @@
+{
+  "approach": "Reuse the existing stdout branch when the output flag is a dash.",
+  "architecture_fit": "Keep the CLI dispatcher in __main__.py. Leave parsers and renderers alone.",
+  "tests": "Use a CLI subprocess with a pre-existing dash file.",
+  "targets": [
+    {
+      "path": "src/mistune/__main__.py",
+      "symbol": "_output",
+      "action": "edit",
+      "change": "Use stdout for a dash."
+    }
+  ],
+  "context": [
+    "tests/test_cli.py"
+  ]
+}

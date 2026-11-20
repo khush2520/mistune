@@ -1,0 +1,11 @@
+--- a/src/mistune/__main__.py
++++ b/src/mistune/__main__.py
+@@ -37,6 +37,8 @@
+     if args.output:
+         with open(args.output, "w", encoding="utf-8") as f:
+             f.write(text)
++        if args.output == "-":
++            print(text)
+     else:
+         _ensure_stdout_utf8()
+         print(text)

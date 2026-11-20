@@ -1,0 +1,6 @@
+case,issue,expected,seeded_behavior
+R1,F1,approve,Correctly treats both output flags with a dash as stdout
+R2,F1,request_changes,Prints to stdout but also creates or overwrites the dash file
+R3,B1,request_changes,Treats empty stdin as an explicitly supplied empty message
+R4,refactor,approve,Guard clause preserves the regular file and stdout paths
+R5,refactor,request_changes,Ignores the caller's filename and writes to out.html

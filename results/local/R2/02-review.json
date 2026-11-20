@@ -1,0 +1,12 @@
+{
+  "verdict": "approve",
+  "summary": "The requested output is printed.",
+  "findings": [
+    {
+      "path": "src/mistune/__main__.py",
+      "line": 34,
+      "problem": "The dash path is also opened for writing.",
+      "return_to": "implementation"
+    }
+  ]
+}

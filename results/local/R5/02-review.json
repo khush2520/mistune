@@ -1,0 +1,5 @@
+{
+  "verdict": "request_changes",
+  "summary": "The caller's output path is ignored.",
+  "findings": []
+}
