@@ -26,4 +26,4 @@ The local probes use an offline Docker container and authored model responses. [
 | R4 | [#9](https://github.com/khush2520/mistune/pull/9) |
 | R5 | [#10](https://github.com/khush2520/mistune/pull/10) |
 
-These draft PRs are evaluator fixtures. The local D8 measurements used the matching diffs and scripted reviewer responses.
+These draft PRs are evaluator fixtures. The local D8 measurements used the matching diffs and scripted reviewer responses. The [behavior checks](seed-validation.md) confirm the expected labels against the CLI.
