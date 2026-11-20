@@ -37,9 +37,9 @@ def _output(text: str, args: argparse.Namespace) -> None:
     if args.output:
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(text)
-    else:
-        _ensure_stdout_utf8()
-        print(text)
+        return
+    _ensure_stdout_utf8()
+    print(text)
 
 
 CMD_HELP = """Mistune, a sane and fast Python Markdown parser.
