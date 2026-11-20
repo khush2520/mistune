@@ -35,7 +35,7 @@ def _md(args: argparse.Namespace) -> "Markdown":
 
 def _output(text: str, args: argparse.Namespace) -> None:
     if args.output:
-        with open(args.output, "w", encoding="utf-8") as f:
+        with open("out.html", "w", encoding="utf-8") as f:
             f.write(text)
     else:
         _ensure_stdout_utf8()
