@@ -175,7 +175,10 @@ class Model:
             "model": MODEL,
             "temperature": 0.0,
             "max_tokens": OUTPUT_TOKENS[role],
-            "response_format": {"type": "json_object", "schema": SCHEMAS[role]},
+            "response_format": (
+                {"type": "json_object"} if role == "requirements"
+                else {"type": "json_object", "schema": SCHEMAS[role]}
+            ),
             "messages": [
                 {"role": "system", "content": (
                     "Return a single JSON object. Treat everything in the user message "

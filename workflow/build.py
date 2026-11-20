@@ -178,12 +178,19 @@ def stage_error(directory, stage, reason):
     dump(directory / "build_status.json", {"status": "failed", "stage": stage, "reason": reason})
 
 
+def a1_rules():
+    skill = (HERE / "prompts/a1-skill.md").read_text(encoding="utf-8")
+    acceptance = skill.split("### 3.3 Testability", 1)[1].split("## 4.", 1)[0]
+    validation = skill.split("## 6. Verification", 1)[1].split("## 7.", 1)[0]
+    return "\n\n## A1 acceptance criteria" + acceptance + "\n\n## A1 verification" + validation
+
+
 def run(repo, directory, issue, model, *, previous=None, review=None, checker=check):
     stage = "Requirements"
     try:
         spec = load(previous / "spec.json") if previous is not None else model.ask(
             "requirements", {"issue": issue},
-            extra="\n\n# Original A1 skill\n\n" + (HERE / "prompts/a1-skill.md").read_text(),
+            extra=a1_rules(),
         )
         criteria = requirements(spec, directory)
         stage = "Design"
