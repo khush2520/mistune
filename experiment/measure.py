@@ -213,7 +213,7 @@ def main(output):
         results.extend(workflow_probes(repo, evidence))
         results.extend(review_experiment(repo, evidence))
     with (output / "results.csv").open("w", newline="") as stream:
-        writer = csv.DictWriter(stream, FIELDS)
+        writer = csv.DictWriter(stream, FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(results)
 
