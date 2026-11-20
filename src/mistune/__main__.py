@@ -37,6 +37,8 @@ def _output(text: str, args: argparse.Namespace) -> None:
     if args.output:
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(text)
+        if args.output == "-":
+            print(text)
     else:
         _ensure_stdout_utf8()
         print(text)
