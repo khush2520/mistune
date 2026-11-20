@@ -1,0 +1,42 @@
+name: AutoSE CI
+run-name: AutoSE CI ${{ inputs.label }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      base:
+        required: true
+        type: string
+      label:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: startsWith(github.ref, 'refs/heads/autose/issue-') && github.repository == vars.AUTOSE_FORK
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base }}
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: candidate
+          persist-credentials: false
+      - name: Build isolated checker
+        run: docker build -t autose-checks:local control/workflow
+      - name: Verify candidate
+        run: python3 control/workflow/ci.py candidate evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-evidence
+          path: evidence
+          retention-days: 90

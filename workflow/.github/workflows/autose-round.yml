@@ -1,0 +1,249 @@
+name: AutoSE round
+
+on:
+  workflow_call:
+    inputs:
+      round:
+        required: true
+        type: number
+      base:
+        required: true
+        type: string
+      branch:
+        required: true
+        type: string
+      issue:
+        required: true
+        type: string
+      intake:
+        required: true
+        type: string
+      old_head:
+        type: string
+      pr:
+        type: string
+      previous:
+        type: string
+      feedback:
+        type: string
+    secrets:
+      model_key:
+        required: false
+    outputs:
+      head:
+        value: ${{ jobs.release.outputs.head }}
+      pr:
+        value: ${{ jobs.release.outputs.pr }}
+      build:
+        value: ${{ jobs.build.outputs.artifact }}
+      review:
+        value: ${{ jobs.review.outputs.artifact }}
+      route:
+        value: ${{ jobs.publish.outputs.route }}
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    outputs:
+      artifact: ${{ steps.naming.outputs.artifact }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base }}
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.old_head || inputs.base }}
+          path: candidate
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.intake }}
+          path: intake
+      - uses: actions/download-artifact@v4
+        if: inputs.round == 2
+        with:
+          name: ${{ inputs.previous }}
+          path: previous
+      - uses: actions/download-artifact@v4
+        if: inputs.round == 2
+        with:
+          name: ${{ inputs.feedback }}
+          path: feedback
+      - name: Name build artifact
+        id: naming
+        env:
+          ROUND_NUMBER: ${{ inputs.round }}
+        run: echo "artifact=build-${GITHUB_RUN_ATTEMPT}-${ROUND_NUMBER}" >> "$GITHUB_OUTPUT"
+      - name: Build isolated checker
+        run: docker build -t autose-checks:local control/workflow
+      - name: Write requirements, design, code and tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.model_key }}
+          AUTOSE_MODEL: ${{ vars.AUTOSE_MODEL }}
+          ROUND_NUMBER: ${{ inputs.round }}
+        run: |
+          args=()
+          if [[ "$ROUND_NUMBER" == "2" ]]; then
+            args+=(--previous previous --review feedback/review.json)
+          fi
+          python3 control/workflow/build.py --repo candidate --artifacts evidence --issue intake/issue.json "${args[@]}"
+      - name: Record runner setup failure
+        if: failure()
+        run: |
+          if [[ ! -d evidence ]]; then
+            mkdir -p evidence
+            printf '# Build runner\n\nRunner setup failed before requirements. See the failed Actions step.\n' > evidence/setup.md
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-${{ github.run_attempt }}-${{ inputs.round }}
+          path: evidence
+          retention-days: 90
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    outputs:
+      head: ${{ steps.release.outputs.head }}
+      pr: ${{ steps.release.outputs.pr }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base }}
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.old_head || inputs.base }}
+          path: candidate
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.artifact }}
+          path: build
+      - name: Push candidate, open pull request and wait for CI
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ inputs.base }}
+          OLD_HEAD: ${{ inputs.old_head }}
+          BRANCH: ${{ inputs.branch }}
+          ISSUE_NUMBER: ${{ inputs.issue }}
+          PR_NUMBER: ${{ inputs.pr }}
+          ROUND_NUMBER: ${{ inputs.round }}
+        run: |
+          args=()
+          if [[ -n "$PR_NUMBER" ]]; then args+=(--pr "$PR_NUMBER"); fi
+          python3 control/workflow/github_flow.py release --repo candidate --build build --artifacts evidence \
+            --base "$BASE" --old-head "$OLD_HEAD" --branch "$BRANCH" --number "$ISSUE_NUMBER" --round "$ROUND_NUMBER" "${args[@]}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-${{ github.run_attempt }}-${{ inputs.round }}
+          path: evidence
+          retention-days: 90
+
+  review:
+    needs: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    permissions:
+      contents: read
+    outputs:
+      artifact: ${{ steps.naming.outputs.artifact }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base }}
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release.outputs.head }}
+          fetch-depth: 0
+          path: candidate
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.intake }}
+          path: intake
+      - name: Name review artifact
+        id: naming
+        env:
+          ROUND_NUMBER: ${{ inputs.round }}
+        run: echo "artifact=review-${GITHUB_RUN_ATTEMPT}-${ROUND_NUMBER}" >> "$GITHUB_OUTPUT"
+      - name: Build isolated checker
+        run: docker build -t autose-checks:local control/workflow
+      - name: Independently review the released commit
+        env:
+          OPENAI_API_KEY: ${{ secrets.model_key }}
+          AUTOSE_MODEL: ${{ vars.AUTOSE_MODEL }}
+          BASE: ${{ inputs.base }}
+          HEAD: ${{ needs.release.outputs.head }}
+          ROUND_NUMBER: ${{ inputs.round }}
+        run: >
+          python3 control/workflow/review.py --repo candidate --artifacts evidence
+          --issue intake/issue.json --base "$BASE" --head "$HEAD" --round "$ROUND_NUMBER"
+      - name: Record runner setup failure
+        if: failure()
+        run: |
+          if [[ ! -d evidence ]]; then
+            mkdir -p evidence
+            printf '# Review runner\n\nRunner setup failed before review. See the failed Actions step.\n' > evidence/review.md
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: review-${{ github.run_attempt }}-${{ inputs.round }}
+          path: evidence
+          retention-days: 90
+
+  publish:
+    needs: [review, release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    permissions:
+      contents: read
+      pull-requests: write
+    outputs:
+      route: ${{ steps.publish.outputs.route }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.review.outputs.artifact }}
+          path: review
+      - name: Publish review on the checked commit
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ inputs.base }}
+          HEAD: ${{ needs.release.outputs.head }}
+          BRANCH: ${{ inputs.branch }}
+          PR_NUMBER: ${{ needs.release.outputs.pr }}
+          ROUND_NUMBER: ${{ inputs.round }}
+        run: >
+          python3 workflow/github_flow.py publish --review review --artifacts evidence
+          --base "$BASE" --head "$HEAD" --branch "$BRANCH" --pr "$PR_NUMBER" --round "$ROUND_NUMBER"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: posted-review-${{ github.run_attempt }}-${{ inputs.round }}
+          path: evidence
+          retention-days: 90

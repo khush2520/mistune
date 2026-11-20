@@ -1,0 +1,86 @@
+name: AutoSE
+run-name: AutoSE issue #${{ github.event.issue.number }}
+
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+
+permissions: {}
+
+concurrency:
+  group: autose-issue-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    if: >-
+      github.repository == vars.AUTOSE_FORK &&
+      !github.event.issue.pull_request &&
+      github.event.issue.state == 'open' &&
+      ((github.event_name == 'issues' && github.event.label.name == 'autose') ||
+       (github.event_name == 'issue_comment' &&
+        format('{0}.', github.event.comment.body) == '/autose.'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    outputs:
+      base: ${{ steps.intake.outputs.base }}
+      branch: ${{ steps.intake.outputs.branch }}
+      issue: ${{ steps.intake.outputs.issue }}
+      intake: ${{ steps.intake.outputs.intake }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Authorize sender and save issue
+        id: intake
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTOSE_FORK: ${{ vars.AUTOSE_FORK }}
+        run: python3 workflow/github_flow.py authorize --artifacts intake
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: intake-${{ github.run_attempt }}
+          path: intake/
+          retention-days: 90
+
+  first:
+    needs: authorize
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    uses: ./.github/workflows/autose-round.yml
+    with:
+      round: 1
+      base: ${{ needs.authorize.outputs.base }}
+      branch: ${{ needs.authorize.outputs.branch }}
+      issue: ${{ needs.authorize.outputs.issue }}
+      intake: ${{ needs.authorize.outputs.intake }}
+    secrets:
+      model_key: ${{ secrets.OPENAI_API_KEY }}
+
+  second:
+    needs: [authorize, first]
+    if: needs.first.outputs.route == 'design' || needs.first.outputs.route == 'implementation'
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    uses: ./.github/workflows/autose-round.yml
+    with:
+      round: 2
+      base: ${{ needs.authorize.outputs.base }}
+      branch: ${{ needs.authorize.outputs.branch }}
+      issue: ${{ needs.authorize.outputs.issue }}
+      intake: ${{ needs.authorize.outputs.intake }}
+      old_head: ${{ needs.first.outputs.head }}
+      pr: ${{ needs.first.outputs.pr }}
+      previous: ${{ needs.first.outputs.build }}
+      feedback: ${{ needs.first.outputs.review }}
+    secrets:
+      model_key: ${{ secrets.OPENAI_API_KEY }}

@@ -1,0 +1,3 @@
+Implement the spec within the named source files in the design. Use the supplied current file contents. Preserve full file content when editing. If given a failed build or test report, use it to address the failure and keep the declared scope. Use tests as evidence, including any previous code review findings. Do not write tests at this stage. Do not add dependencies or edit configuration.
+
+Return JSON with files as an object mapping a source file path to its complete replacement text. Only include changed files. Return an empty object for files if the current source already meets the criteria and the repair only concerns tests.
