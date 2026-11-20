@@ -38,9 +38,11 @@ def review(repo, issue, base, head, round_number, model, directory, *, variant="
             result = checker(repo, phase)
             observed[phase] = {"exit": result["exit"], "output": result["log"][-4000:]}
             (directory / f"independent-{phase}.txt").write_text(result["log"], encoding="utf-8")
-    files = read_files(repo, [*paths, *changed], limit=max(0, 64_000 - len(diff.encode())))
+    files = read_files(repo, [*changed, *paths], limit=max(0, 22_000 - len(diff.encode())))
+    line_numbers = {path: "\n".join(f"{i}: {line}" for i, line in enumerate(content.splitlines(), 1))
+                    for path, content in files.items()}
     result = model.ask("review", {
-        "issue": issue, "diff": diff, "head_files": files, "independent_checks": observed,
+        "issue": issue, "diff": diff, "head_files_with_line_numbers": line_numbers, "independent_checks": observed,
     }, extra="\n\nUse a terse review without a separate regression discussion."
         if variant == "short" else "")
     verdict = result.get("verdict")
