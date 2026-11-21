@@ -1,6 +1,6 @@
 # Sequence view
 
-The diagram shows the local F1 probe, which used authored model responses and the same checks as the workflow. F1 is now a historical case. Issue #12, the F3 CLI version shortcut, is the next hosted demo input. [Run ledger](../../results/runs.md)
+The diagram shows the local F1 probe, which used authored model responses and the same checks as the workflow. F1 is the original stdout-dash issue #3 and the active demo input. [Run ledger](../../results/runs.md)
 
 ```mermaid
 sequenceDiagram

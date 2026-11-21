@@ -13,4 +13,4 @@
 
 Hidden tests were kept outside the repository. The baseline rows check that the suite can detect the reported gaps. The F1 and V1 candidates use authored model inputs.
 
-The F3 reference ran in a temporary checkout to validate the new hidden tests. Issue #12 has no hosted agent result yet.
+The F3 reference ran in a temporary checkout to validate its hidden tests. Issue #12 is archived.

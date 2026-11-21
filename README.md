@@ -4,7 +4,7 @@ This assignment uses [khush2520/mistune](https://github.com/khush2520/mistune). 
 
 ## Run an issue
 
-Use [issue #12](https://github.com/khush2520/mistune/issues/12), the `-V` shortcut, for the next demo run. The active issue list and the two attempts on the original issue #3 are in the [run ledger](results/runs.md).
+Use [issue #3](https://github.com/khush2520/mistune/issues/3), the original request for `--output -` to use stdout, for the demo. The active issue list and all attempts are in the [run ledger](results/runs.md).
 
 1. On the fork, open an issue with the behavior you want and an example.
 2. As a repository maintainer, add the `autose` label or post exactly `/autose`.
@@ -39,7 +39,7 @@ Use a fresh output directory. These probes use scripted model responses, which m
 
 ## Hosted run status
 
-The hosted reviewer experiment finished on all five seeded PRs. Each concrete issue reached at least requirements in the later cohort, and the vague issue stopped to request an example. GitHub rejected the next dispatch with HTTP 422 even though repository Actions permissions show enabled and the workflows show active. The ledger records the stopped runs and the missing hosted release and review. [Run ledger](results/runs.md) · [GitHub Actions settings guidance](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository)
+The hosted reviewer experiment finished on all five seeded PRs. Each concrete issue reached at least requirements in the later cohort, and the vague issue stopped to request an example. GitHub rejected the next dispatch with HTTP 422 even though repository Actions permissions show enabled and the workflows show active. GitHub later accepted the restored #3 demo run. The ledger tracks its outcome alongside the earlier attempts. [Run ledger](results/runs.md) · [GitHub Actions settings guidance](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository)
 
 ## AI assistance
 

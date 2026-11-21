@@ -101,7 +101,8 @@ def hosted_results():
         seeded = list(csv.DictReader(stream))
     latest = {}
     for row in issues:
-        latest[row["case"]] = row
+        if row["case"] != "F3":
+            latest[row["case"]] = row
     completed = [row for row in latest.values() if row["conclusion"] in {"success", "failure"}]
     stages = ("requirements", "design", "implementation", "testing", "release", "review")
     rates = []
@@ -227,15 +228,15 @@ def render():
         page.text("The pinned baseline passed 1,327 tests and 158 subtests. The local F1 candidate passed all three hidden cases. "
                   "The V1 hidden checks evaluate the requirements artifact because an ambiguous issue should stop before release.")
         page.text("Hosted hidden scores were recorded as follows. " + (hidden or "No held-out score was available when this report was generated."))
-        page.text("Issue #12 (F3) replaces F1 for the next demo. The new version-flag tests passed 1/3 on the pinned baseline and 3/3 against a temporary reference. No hosted result has been recorded for F3.")
+        page.text("The original F1 issue #3 is the demo input. The temporary F3 version-flag case is archived with its hidden tests and any recorded runs.")
         page.heading("Hosted observations")
         if live_review:
             page.text(f"{live_review['case']} produced a tested PR with a posted {live_review['verdict'].replace('_', ' ')} verdict. "
                       "The run ledger links to the issue, CI and review.")
         else:
-            page.text("The initial model repeatedly requested details already given in the issue. The compact intake cleared four concrete issues on the next attempt. Subsequent gates stopped on model or test failures. GitHub then refused new dispatches with HTTP 422, leaving release and review unverified for issue runs.")
+            page.text("The initial model repeatedly requested details already given in the issue. The compact intake cleared four concrete issues on the next attempt. Subsequent gates stopped on model or test failures. GitHub rejected some dispatches with HTTP 422 and later accepted the restored F1 issue. The run ledger records the available release and review evidence.")
         page.text(f"Qwen reported {tokens:,} tokens across the hosted issue and seeded-review runs. Total paid model spend was $0. "
-                  "Requests that timed out without returning usage are excluded from the token count.")
+                  "Timed-out and cancelled calls without reported usage are excluded from the token count.")
         page.finish()
 
         page.page("Hindsight and validity", "What the evidence supports and what still needs measurement")
@@ -244,7 +245,7 @@ def render():
                   "but each larger source file increases the input and output budget. A smaller verified change format could make multi-file work feasible without giving the model shell access.")
         page.heading("Limitations")
         page.text("1. One repository and four small product tasks. The current scope excludes changes to dependencies and workflow configuration, so these results do not predict performance on large changes.")
-        page.text("2. The local gate experiments use scripted responses. The hosted cohort measures live model behavior on the original five issues. The replacement F3 has no hosted result.")
+        page.text("2. The local gate experiments use scripted responses. The hosted stage rates use the latest recorded attempt for each active issue. The retired F3 case stays in the run ledger.")
         page.text("3. The fixture author also supplied the expected labels. Seeded issues emphasize cases the author anticipated. Independent labeling would reduce this bias.")
         page.text("4. Structural checks can be satisfied by weak assertions. Test mappings and a valid line reference still need behavior-based review.")
         page.text("5. Docker verification used a local Apple Silicon machine. Hosted runner setup, token permissions and service latency can affect a live run.")

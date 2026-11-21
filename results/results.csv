@@ -9,3 +9,4 @@ V1,5,intake,44836022294,https://github.com/khush2520/mistune/actions/runs/448360
 B1,1,intake,44836026889,https://github.com/khush2520/mistune/actions/runs/44836026889,failure,pass,pass,stop,skipped,skipped,skipped,,,,,,,19899,Replacement text for src/mistune/__main__.py must match exactly once.
 B2,2,intake,44836031767,https://github.com/khush2520/mistune/actions/runs/44836031767,failure,pass,pass,pass,stop,skipped,skipped,,,,,1,3,31555,The full suite failed or collected no tests (exit 1).
 F2,4,intake,44836037626,https://github.com/khush2520/mistune/actions/runs/44836037626,failure,pass,pass,pass,stop,skipped,skipped,,,,,2,3,26269,A model proposed an edit outside this stage's allowlist.
+F3,12,2cba295,44883878553,https://github.com/khush2520/mistune/actions/runs/44883878553,cancelled,pass,skipped,skipped,skipped,skipped,skipped,,,,,,,1613,Cancelled after the original issue #3 was restored.
