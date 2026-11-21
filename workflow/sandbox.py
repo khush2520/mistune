@@ -41,7 +41,10 @@ def run_container(project, phase):
     try:
         completed = subprocess.run(command, capture_output=True, timeout=150)
     except subprocess.TimeoutExpired:
-        subprocess.run(["docker", "rm", "-f", name], capture_output=True, timeout=10, check=False)
+        try:
+            subprocess.run(["docker", "rm", "-f", name], capture_output=True, timeout=10, check=False)
+        except (OSError, subprocess.TimeoutExpired):
+            raise Stop(f"The {phase} container timed out and Docker did not confirm cleanup.") from None
         raise Stop(f"The {phase} container timed out.") from None
     if completed.returncode:
         raise Stop(f"The {phase} container failed to return a check result.")
