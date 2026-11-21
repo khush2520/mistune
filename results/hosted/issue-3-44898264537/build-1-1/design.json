@@ -1,0 +1,17 @@
+{
+  "approach": "Modify the `_output` function in `src/mistune/__main__.py` to handle the `--output -` option by sending the result to stdout instead of writing to a file.",
+  "architecture_fit": "This change adheres to the constraints by not altering the token contract, extending through the `plugin(md)` mechanism, and respecting the import layering. It also routes HTML output through the renderer's safety helpers by using the existing `HTMLRenderer` methods.",
+  "tests": "Add a new test case in `tests/test_cli.py` to verify that the `--output -` option sends the result to stdout.",
+  "targets": [
+    {
+      "path": "src/mistune/__main__.py",
+      "symbol": "_output",
+      "action": "edit",
+      "change": "if args.output == '-':\n    import sys\n    sys.stdout.write(rendered_text)\nelse:\n    with open(args.output, 'w', encoding='utf-8') as f:\n        f.write(rendered_text)"
+    }
+  ],
+  "context": [
+    "src/mistune/__main__.py",
+    "tests/test_cli.py"
+  ]
+}

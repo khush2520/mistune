@@ -1,0 +1,18 @@
+[
+  {
+    "case": "R5",
+    "variant": "rubric",
+    "head": "852ead0befe73a4c39dcc2a6e337cfd14e63f3fa",
+    "verdict": "request_changes",
+    "detail": "",
+    "tokens": 4274
+  },
+  {
+    "case": "R5",
+    "variant": "short",
+    "head": "852ead0befe73a4c39dcc2a6e337cfd14e63f3fa",
+    "verdict": "request_changes",
+    "detail": "",
+    "tokens": 4284
+  }
+]

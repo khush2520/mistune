@@ -9,6 +9,9 @@ on:
       base:
         required: true
         type: string
+      control:
+        required: true
+        type: string
       branch:
         required: true
         type: string
@@ -26,9 +29,6 @@ on:
         type: string
       feedback:
         type: string
-    secrets:
-      model_key:
-        required: false
     outputs:
       head:
         value: ${{ jobs.release.outputs.head }}
@@ -46,7 +46,7 @@ permissions: {}
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     permissions:
       contents: read
     outputs:
@@ -54,7 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.base }}
+          ref: ${{ inputs.control }}
           path: control
           persist-credentials: false
       - uses: actions/checkout@v4
@@ -83,10 +83,10 @@ jobs:
         run: echo "artifact=build-${GITHUB_RUN_ATTEMPT}-${ROUND_NUMBER}" >> "$GITHUB_OUTPUT"
       - name: Build isolated checker
         run: docker build -t autose-checks:local control/workflow
+      - name: Start free Qwen inference
+        run: bash control/workflow/local_model.sh
       - name: Write requirements, design, code and tests
         env:
-          OPENAI_API_KEY: ${{ secrets.model_key }}
-          AUTOSE_MODEL: ${{ vars.AUTOSE_MODEL }}
           ROUND_NUMBER: ${{ inputs.round }}
         run: |
           args=()
@@ -122,7 +122,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.base }}
+          ref: ${{ inputs.control }}
           path: control
           persist-credentials: false
       - uses: actions/checkout@v4
@@ -159,7 +159,7 @@ jobs:
   review:
     needs: release
     runs-on: ubuntu-latest
-    timeout-minutes: 9
+    timeout-minutes: 22
     permissions:
       contents: read
     outputs:
@@ -167,7 +167,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.base }}
+          ref: ${{ inputs.control }}
           path: control
           persist-credentials: false
       - uses: actions/checkout@v4
@@ -187,10 +187,10 @@ jobs:
         run: echo "artifact=review-${GITHUB_RUN_ATTEMPT}-${ROUND_NUMBER}" >> "$GITHUB_OUTPUT"
       - name: Build isolated checker
         run: docker build -t autose-checks:local control/workflow
+      - name: Start free Qwen inference
+        run: bash control/workflow/local_model.sh
       - name: Independently review the released commit
         env:
-          OPENAI_API_KEY: ${{ secrets.model_key }}
-          AUTOSE_MODEL: ${{ vars.AUTOSE_MODEL }}
           BASE: ${{ inputs.base }}
           HEAD: ${{ needs.release.outputs.head }}
           ROUND_NUMBER: ${{ inputs.round }}
@@ -223,7 +223,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.base }}
+          ref: ${{ inputs.control }}
           persist-credentials: false
       - uses: actions/download-artifact@v4
         with:

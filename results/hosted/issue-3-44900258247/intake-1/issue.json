@@ -1,0 +1,5 @@
+{
+  "number": 3,
+  "title": "Let me send CLI output to stdout with --output -",
+  "body": "Our wrapper expects `--output -` to send the result down a pipeline. Mistune currently writes a file called `-` instead. Can `-o -` and `--output -` use exactly the normal stdout format? Other filenames should still work and a file already called `-` should be left alone."
+}

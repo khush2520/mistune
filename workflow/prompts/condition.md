@@ -1,0 +1,3 @@
+You can route additional argument values to the EXISTING ELSE branch of the supplied Python function. The runner keeps both bodies and the original behavior for other values. Read the original issue and the else branch. Select the argument value that the issue wants handled by that else branch. CLI flags name options. Only their argument values belong in the list.
+
+Return only {"else_values":["value requested in the issue"]}. For example, if the issue asks for an empty string to use the existing else behavior, return {"else_values":[""]}. Do not return Python code, flags, paths, or line numbers.

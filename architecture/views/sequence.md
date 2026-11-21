@@ -1,6 +1,6 @@
 # Sequence view
 
-The diagram shows the local F1 probe. It uses authored model responses and the same checks as the workflow. The hosted issue, Actions run and review links belong in the [run ledger](../../results/runs.md).
+The diagram shows the local F1 probe, which used authored model responses and the same checks as the workflow. F1 is the original stdout-dash issue #3 and the active demo input. [Run ledger](../../results/runs.md)
 
 ```mermaid
 sequenceDiagram
@@ -22,3 +22,23 @@ sequenceDiagram
 ```
 
 A hosted run inserts the release job between builder and review. The release job validates the patch again, pushes the branch, opens a PR, and waits for same-commit CI. A separate publisher posts the reviewer verdict on the PR.
+
+## Hosted F1 attempt
+
+```mermaid
+sequenceDiagram
+    participant M as Maintainer
+    participant G as GitHub Actions intake
+    participant Q as Loopback Qwen process
+    participant A as Run artifacts
+    M->>G: Dispatch issue 3 from the evidence branch
+    G->>G: Check write access and pin the issue and main SHA
+    G->>Q: Apply the compact A1 requirements prompt
+    Q-->>G: Return a ready spec with observable criteria
+    G->>A: Save the specification
+    G->>Q: Request a design using the A2 architecture
+    Q--xG: The design call times out
+    G->>A: Save the failed gate and stop
+```
+
+The hosted release and review jobs were skipped. The separate reviewer comparison completed for all five seeded PRs. [F1 Actions run](https://github.com/khush2520/mistune/actions/runs/44836017315) · [Seeded reviewer Actions run](https://github.com/khush2520/mistune/actions/runs/44787096358)

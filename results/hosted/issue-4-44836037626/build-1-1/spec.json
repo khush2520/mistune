@@ -1,0 +1,60 @@
+{
+  "status": "ready",
+  "summary": "Add an optional CSS class to the outer TOC list",
+  "actors": [
+    "Developer"
+  ],
+  "constraints": [
+    "The default output should stay byte-for-byte the same, including the empty string for an empty TOC.",
+    "Handle class values like `docs toc` and quote characters as HTML attribute text."
+  ],
+  "assumptions": [
+    "The current implementation of `mistune.toc.render_toc_ul` does not include a `css_class` parameter."
+  ],
+  "questions": [],
+  "criteria": [
+    {
+      "id": "AC-01",
+      "requirement": "FR-01",
+      "evidence": "The function should accept a `css_class` keyword argument.",
+      "provenance": "inferred",
+      "given": "The function is called with a `css_class` parameter.",
+      "when": "The function executes.",
+      "then": "The outer `<ul>` element should have the specified `css_class` attribute."
+    },
+    {
+      "id": "AC-02",
+      "requirement": "FR-02",
+      "evidence": "The default output should stay byte-for-byte the same, including the empty string for an empty TOC.",
+      "provenance": "confirmed",
+      "given": "The function is called with an empty `css_class` parameter.",
+      "when": "The function executes.",
+      "then": "The output should be the same as the default output without any additional attributes."
+    },
+    {
+      "id": "AC-03",
+      "requirement": "FR-03",
+      "evidence": "Handle class values like `docs toc` and quote characters as HTML attribute text.",
+      "provenance": "confirmed",
+      "given": "The function is called with a `css_class` parameter containing the value `docs toc`.",
+      "when": "The function executes.",
+      "then": "The output should include the `docs toc` class attribute in the outer `<ul>` element."
+    },
+    {
+      "id": "AC-04",
+      "requirement": "FR-04",
+      "evidence": "Handle class values like `docs toc` and quote characters as HTML attribute text.",
+      "provenance": "confirmed",
+      "given": "The function is called with a `css_class` parameter containing the value `\"docs toc\"`.",
+      "when": "The function executes.",
+      "then": "The output should include the `docs toc` class attribute in the outer `<ul>` element, with the quote characters properly escaped."
+    }
+  ],
+  "checks": {
+    "completeness": true,
+    "consistency": true,
+    "traceability": true,
+    "feasibility": true,
+    "testability": true
+  }
+}

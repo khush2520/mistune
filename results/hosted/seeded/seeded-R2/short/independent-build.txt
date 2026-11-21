@@ -1,0 +1,10 @@
+WARNING: The directory '/nonexistent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.
+Processing ./.
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: mistune
+  Building wheel for mistune (pyproject.toml): started
+  Building wheel for mistune (pyproject.toml): finished with status 'done'
+  Created wheel for mistune: filename=mistune-3.4.0-py3-none-any.whl size=70376 sha256=3fed5d0fcf531f32e521f021b66a0f90f04ddfcd3f0ed5b4eb882a5fe8e483df
+  Stored in directory: /tmp/pip-ephem-wheel-cache-vmfy1i7o/wheels/0c/54/49/b98b8cb41b2bedfc1706d29daeb305174594fa032d4adf2b61
+Successfully built mistune

@@ -1,0 +1,62 @@
+{
+  "status": "ready",
+  "summary": "Add a short `-V` flag for the CLI version",
+  "actors": [
+    "User"
+  ],
+  "constraints": [
+    "The `-V` flag should print the same version line to stdout as `--version` and exit successfully.",
+    "The `-V` flag should work without reading stdin.",
+    "If `-m` is also passed, the version flag should still print only the version.",
+    "A normal `-m` invocation should render Markdown as before."
+  ],
+  "assumptions": [
+    "The current version of Mistune can be accessed via `python -m mistune --version`."
+  ],
+  "questions": [],
+  "criteria": [
+    {
+      "id": "AC-01",
+      "requirement": "FR-01",
+      "evidence": "The `-V` flag should print the same version line to stdout as `--version` and exit successfully.",
+      "provenance": "inferred",
+      "given": "A user runs `python -m mistune -V`.",
+      "when": "The command is executed.",
+      "then": "The output should be the same version line as `python -m mistune --version` and the program should exit successfully."
+    },
+    {
+      "id": "AC-02",
+      "requirement": "FR-02",
+      "evidence": "The `-V` flag should work without reading stdin.",
+      "provenance": "inferred",
+      "given": "A user runs `python -m mistune -V` with no input.",
+      "when": "The command is executed.",
+      "then": "The program should not read from stdin and should exit successfully."
+    },
+    {
+      "id": "AC-03",
+      "requirement": "FR-03",
+      "evidence": "If `-m` is also passed, the version flag should still print only the version.",
+      "provenance": "inferred",
+      "given": "A user runs `python -m mistune -m -V`.",
+      "when": "The command is executed.",
+      "then": "The output should be the same version line as `python -m mistune --version` and the program should exit successfully."
+    },
+    {
+      "id": "AC-04",
+      "requirement": "FR-04",
+      "evidence": "A normal `-m` invocation should render Markdown as before.",
+      "provenance": "inferred",
+      "given": "A user runs `python -m mistune -m` with Markdown input.",
+      "when": "The command is executed.",
+      "then": "The output should be the rendered Markdown as before."
+    }
+  ],
+  "checks": {
+    "completeness": true,
+    "consistency": true,
+    "traceability": true,
+    "feasibility": true,
+    "testability": true
+  }
+}

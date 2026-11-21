@@ -1,0 +1,11 @@
+case,variant,expected,verdict,tokens,head
+R1,rubric,approve,approve,3979,5ab011cfcb6e3f8f6b30a0b61c0419d440c5d242
+R1,short,approve,approve,3985,5ab011cfcb6e3f8f6b30a0b61c0419d440c5d242
+R2,rubric,request_changes,approve,3993,7a2a160fe5c3356fe642c095209898374fc9f1cf
+R2,short,request_changes,approve,3992,7a2a160fe5c3356fe642c095209898374fc9f1cf
+R3,rubric,request_changes,approve,4085,b03afac61582646e9c3730c5be08b2f23ac1584e
+R3,short,request_changes,approve,4316,b03afac61582646e9c3730c5be08b2f23ac1584e
+R4,rubric,approve,approve,3897,6397eae39b7cb350934b8ef663eb1b4e833bc89d
+R4,short,approve,approve,3910,6397eae39b7cb350934b8ef663eb1b4e833bc89d
+R5,rubric,request_changes,request_changes,4274,852ead0befe73a4c39dcc2a6e337cfd14e63f3fa
+R5,short,request_changes,request_changes,4284,852ead0befe73a4c39dcc2a6e337cfd14e63f3fa

@@ -1,0 +1,5 @@
+{
+  "status": "failed",
+  "stage": "Testing",
+  "reason": "The full suite failed or collected no tests (exit 1)."
+}

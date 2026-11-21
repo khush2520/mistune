@@ -1,0 +1,24 @@
+diff --git a/src/mistune/__main__.py b/src/mistune/__main__.py
+index 9cd4ed0..5f46410 100644
+--- a/src/mistune/__main__.py
++++ b/src/mistune/__main__.py
+@@ -33,7 +33,18 @@ def _md(args: argparse.Namespace) -> "Markdown":
+     )
+ 
+ 
+-def _output(text: str, args: argparse.Namespace) -> None:
++    if args.output == '-':
++        import sys
++        sys.stdout.write(text)
++    else:
++        with open(args.output, 'w', encoding='utf-8') as f:
++            f.write(text)
++    if args.output == '-':
++        import sys
++        sys.stdout.write(text)
++    else:
++        with open(args.output, 'w', encoding='utf-8') as f:
++            f.write(text)
+     if args.output:
+         with open(args.output, "w", encoding="utf-8") as f:
+             f.write(text)

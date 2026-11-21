@@ -1,0 +1,3 @@
+# Implementation gate
+
+Expected exactly one matching single-line if condition in src/mistune/__main__.py.

@@ -1,0 +1,43 @@
+{
+  "status": "ready",
+  "summary": "The `add_toc_hook` function should keep the `data-id` attribute value as the heading ID in the table of contents if no real `id` attribute with the same value exists.",
+  "actors": [
+    "User"
+  ],
+  "constraints": [
+    "The `add_toc_hook` function should not modify the `data-id` attribute if a real `id` attribute with the same value exists.",
+    "The `add_toc_hook` function should use the suffix if a real `id` attribute with the same value exists."
+  ],
+  "assumptions": [
+    "The `add_toc_hook` function is used to generate table of contents entries.",
+    "The `data-id` attribute is used to identify the target element for the table of contents entry."
+  ],
+  "questions": [],
+  "criteria": [
+    {
+      "id": "AC-01",
+      "requirement": "FR-01",
+      "evidence": "The `add_toc_hook` function should keep the `data-id` attribute value as the heading ID in the table of contents if no real `id` attribute with the same value exists.",
+      "provenance": "inferred",
+      "given": "A generated page with `<div data-id=\"toc_1\"></div>` followed by its first heading.",
+      "when": "The `add_toc_hook` function is executed.",
+      "then": "The heading should have the ID `toc_1`."
+    },
+    {
+      "id": "AC-02",
+      "requirement": "FR-02",
+      "evidence": "The `add_toc_hook` function should use the suffix if a real `id` attribute with the same value exists.",
+      "provenance": "inferred",
+      "given": "A generated page with `<div id=\"toc_1\"></div>` followed by its first heading.",
+      "when": "The `add_toc_hook` function is executed.",
+      "then": "The heading should have the ID `toc_1_1`."
+    }
+  ],
+  "checks": {
+    "completeness": true,
+    "consistency": true,
+    "traceability": true,
+    "feasibility": true,
+    "testability": true
+  }
+}

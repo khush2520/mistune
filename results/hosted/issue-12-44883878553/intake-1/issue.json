@@ -1,0 +1,5 @@
+{
+  "number": 12,
+  "title": "Add a short `-V` flag for the CLI version",
+  "body": "I use `python -m mistune --version` to check which version a shell script is running. Could Mistune also accept `python -m mistune -V`? The short flag currently exits with an unrecognized argument error.\n\n`-V` should print the same version line to stdout as `--version` and exit successfully. It should work without reading stdin. If I also pass `-m`, the version flag should still print only the version. A normal `-m` invocation should render Markdown as before."
+}

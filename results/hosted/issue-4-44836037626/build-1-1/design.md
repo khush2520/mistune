@@ -1,0 +1,18 @@
+# Design
+
+Add a new keyword argument `css_class` to the `render_toc_ul` function in `src/mistune/toc.py`. This argument will be used to add a class attribute to the outer `<ul>` element of the table of contents. The function will check if the `css_class` is provided and, if so, include it in the `<ul>` element. If not, it will render the TOC as usual.
+
+## Architecture fit
+
+The change adheres to the constraints by ensuring that the default output remains byte-for-byte the same, including the empty string for an empty TOC. It also handles class values like `docs toc` and quote characters as HTML attribute text. The change is implemented in a way that does not affect the public behavior outside the acceptance criteria.
+
+## File and symbol plan
+
+- `src/mistune/toc.py` · `render_toc_ul` (edit) — Add a new keyword argument `css_class` to the `render_toc_ul` function. Check if `css_class` is provided and include it in the outer `<ul>` element. If not, render the TOC as usual.
+
+## Test approach
+
+The tests will cover the following scenarios:
+1. Rendering a TOC with an empty `css_class` should produce the same output as the default TOC.
+2. Rendering a TOC with a non-empty `css_class` should include the specified class attribute in the outer `<ul>` element.
+3. Rendering a TOC with a class value containing spaces and quotes should handle the class attribute correctly.

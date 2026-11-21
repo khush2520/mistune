@@ -10,6 +10,7 @@ from common import (
     HERE, MAX_FILE_BYTES, SOURCE, TEST, Model, Stop, dump, git, load, markdown,
     objects, read_files, safe_path, string, symbols, tracked,
 )
+from cli_cases import compile_cases, compile_scenarios
 from sandbox import check
 
 AC = re.compile(r"AC-\d{2}")
@@ -89,9 +90,7 @@ def design(data, repo, index, directory):
         lines.append(f"- `{path}` · `{symbol}` ({action}) — {change}")
     context = list_of_strings(data, "context")
     project_files = {name for name in tracked(repo) if name.startswith(("src/mistune/", "tests/"))}
-    if len(context) > 4 or any(name not in project_files for name in context):
-        raise Stop("Design context must name at most four tracked files.")
-    read_files(repo, context)
+    data["context"] = [name for name in dict.fromkeys(context) if name in project_files][:4]
     markdown(directory / "design.md", "Design", "\n".join([
         approach, "", "## Architecture fit", "", fit, "", "## File and symbol plan", "",
         *lines, "", "## Test approach", "", checks,
@@ -100,8 +99,97 @@ def design(data, repo, index, directory):
     return allowed
 
 
+def line_replacements(repo, edits, pattern, allowed):
+    grouped = {}
+    for edit in objects(edits, "line edits", maximum=8):
+        name = string(edit.get("path"), "edit path", 150)
+        if not pattern.fullmatch(name) or (allowed is not None and name not in allowed):
+            raise Stop("A model proposed an edit outside this stage's allowlist.")
+        start, end, replacement = edit.get("start"), edit.get("end"), edit.get("replacement")
+        if type(start) is not int or type(end) is not int or not isinstance(replacement, str):
+            raise Stop(f"A line edit in {name} needs integer bounds and replacement text.")
+        grouped.setdefault(name, []).append((start, end, replacement))
+    files = {}
+    for name, changes in grouped.items():
+        path = safe_path(repo, name)
+        if not path.is_file():
+            if len(changes) != 1 or changes[0][:2] != (0, 0):
+                raise Stop(f"A new file needs one edit with start and end set to zero: {name}.")
+            files[name] = changes[0][2]
+            continue
+        lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+        next_start = len(lines) + 1
+        for start, end, replacement in sorted(changes, reverse=True):
+            if not 1 <= start <= end < next_start:
+                raise Stop(f"Line range {start} through {end} overlaps or is outside {name}.")
+            lines[start - 1:end] = [replacement.rstrip("\n") + "\n"] if replacement else []
+            next_start = start
+        files[name] = "".join(lines)
+    return files
+
+
+def condition_replacements(repo, edits, pattern, allowed):
+    files = {}
+    for edit in objects(edits, "condition edits", maximum=8):
+        name = string(edit.get("path"), "edit path", 150)
+        if not pattern.fullmatch(name) or (allowed is not None and name not in allowed):
+            raise Stop("A model proposed a condition outside this stage's allowlist.")
+        path = safe_path(repo, name)
+        original = files.get(name)
+        if original is None:
+            original = path.read_text(encoding="utf-8")
+        expression = string(edit.get("expression"), "if expression", 400)
+        if "\n" in expression or "\r" in expression:
+            raise Stop("A replacement condition must be a single-line Python expression.")
+        try:
+            ast.parse(expression, mode="eval")
+        except SyntaxError:
+            raise Stop("A replacement condition must be a valid Python expression.") from None
+        matches = [node.test for node in ast.walk(ast.parse(original))
+                   if isinstance(node, ast.If) and (
+                       ast.get_source_segment(original, node.test) == edit["condition"]
+                       if "condition" in edit else node.lineno == edit.get("line"))]
+        if len(matches) != 1 or matches[0].lineno != matches[0].end_lineno:
+            raise Stop(f"Expected exactly one matching single-line if condition in {name}.")
+        test = matches[0]
+        lines = original.splitlines(keepends=True)
+        line = lines[test.lineno - 1].encode()
+        replacement = line[:test.col_offset] + expression.encode() + line[test.end_col_offset:]
+        lines[test.lineno - 1] = replacement.decode()
+        files[name] = "".join(lines)
+    return files
+
+
 def apply_files(repo, result, pattern, allowed=None):
     files = result.get("files")
+    if "condition_edits" in result:
+        files = condition_replacements(repo, result["condition_edits"], pattern, allowed)
+    elif "line_edits" in result:
+        files = line_replacements(repo, result["line_edits"], pattern, allowed)
+    elif "edits" in result:
+        files = {}
+        for edit in objects(result["edits"], "edits", maximum=8):
+            name = string(edit.get("path"), "edit path", 150)
+            if not pattern.fullmatch(name) or (allowed is not None and name not in allowed):
+                raise Stop("A model proposed an edit outside this stage's allowlist.")
+            target = safe_path(repo, name)
+            old, new = edit.get("old"), edit.get("new")
+            if not isinstance(old, str) or not isinstance(new, str):
+                raise Stop("Each edit needs old and new text.")
+            if name in files:
+                current = files[name]
+            elif target.is_file():
+                current = target.read_text(encoding="utf-8")
+            else:
+                current = ""
+            if old:
+                if current.count(old) != 1:
+                    raise Stop(f"Replacement text for {name} must match exactly once.")
+                files[name] = current.replace(old, new, 1)
+            elif current or target.exists():
+                raise Stop(f"An empty edit anchor cannot replace existing file {name}.")
+            else:
+                files[name] = new
     if not isinstance(files, dict) or len(files) > 8:
         raise Stop("The files response needs an object with at most eight file entries.")
     for name, content in files.items():
@@ -114,6 +202,8 @@ def apply_files(repo, result, pattern, allowed=None):
             ast.parse(content)
         except SyntaxError as error:
             raise Stop(f"Proposed file {name} does not parse on line {error.lineno}.") from None
+    for name, content in files.items():
+        target = safe_path(repo, name)
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content.rstrip("\n") + "\n", encoding="utf-8")
     if files:
@@ -154,12 +244,50 @@ def stage_error(directory, stage, reason):
     dump(directory / "build_status.json", {"status": "failed", "stage": stage, "reason": reason})
 
 
+def issue_source_matches(repo, issue, paths):
+    text = str(issue.get("title", "")) + "\n" + str(issue.get("body", ""))
+    flags = re.findall(r"(?<![\w-])--[a-z][a-z0-9-]+", text)
+    references = re.findall(r"`((?:[A-Za-z_]\w*\.)*[A-Za-z_]\w*)`", text)
+    arguments = ["args." + flag[2:].replace("-", "_") for flag in flags]
+    terms = list(dict.fromkeys([*flags, *arguments, *(name.rsplit(".", 1)[-1] for name in references)]))[:8]
+    matches = {}
+    for name in paths:
+        source = safe_path(repo, name).read_text(encoding="utf-8")
+        lines = [(i, line.strip()) for i, line in enumerate(source.splitlines(), 1)
+                 if any(term in line for term in terms)]
+        if lines:
+            functions = [node for node in ast.walk(ast.parse(source))
+                         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))]
+            functions.sort(key=lambda node: node.end_lineno - node.lineno)
+            matches[name] = []
+            for number, line in lines[:6]:
+                owner = next((node.name for node in functions if node.lineno <= number <= node.end_lineno), "module")
+                matches[name].append(f"{number} ({owner}): {line}")
+        if len(matches) == 6:
+            break
+    return matches
+
+
+def architecture_context(repo):
+    architecture = (repo / "ARCHITECTURE.md").read_text(encoding="utf-8")
+    overview = architecture.split("## 2. Architecture", 1)[0]
+    constraints = architecture.split("## 3. Constraints", 1)[1]
+    return overview + "\n## 3. Constraints" + constraints
+
+
+def a1_rules():
+    skill = (HERE / "prompts/a1-skill.md").read_text(encoding="utf-8")
+    acceptance = skill.split("### 3.3 Testability", 1)[1].split("## 4.", 1)[0]
+    validation = skill.split("## 6. Verification", 1)[1].split("## 7.", 1)[0]
+    return "\n\n## A1 acceptance criteria" + acceptance + "\n\n## A1 verification" + validation
+
+
 def run(repo, directory, issue, model, *, previous=None, review=None, checker=check):
     stage = "Requirements"
     try:
         spec = load(previous / "spec.json") if previous is not None else model.ask(
             "requirements", {"issue": issue},
-            extra="\n\n# Original A1 skill\n\n" + (HERE / "prompts/a1-skill.md").read_text(),
+            extra=a1_rules(),
         )
         criteria = requirements(spec, directory)
         stage = "Design"
@@ -173,21 +301,71 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
         else:
             plan = model.ask("design", {
                 "issue": issue, "spec": spec, "review_feedback": review,
-                "architecture": (repo / "ARCHITECTURE.md").read_text(), "source_index": index,
+                "architecture": architecture_context(repo),
+                "issue_source_matches": issue_source_matches(repo, issue, index),
+                "source_index": {path: names[:14] for path, names in index.items()},
             })
         allowed = design(plan, repo, index, directory)
         feedback = ""
+        cli_extra = ""
+        if "src/mistune/__main__.py" in allowed:
+            cli_extra = "\n\n" + (HERE / "prompts/cli-testing.md").read_text(encoding="utf-8")
+        original_conditions = {}
+        repair_tests_only = False
         for attempt in (1, 2):
             stage = "Implementation"
+            executed_tests = False
             try:
-                source = read_files(repo, [*sorted(allowed), *plan["context"]])
+                source = read_files(repo, [*sorted(allowed), *plan["context"]], limit=26_000)
                 if any((repo / path).exists() and path not in source for path in allowed):
                     raise Stop("A target file exceeded the implementation context limit.")
-                result = model.ask("implementation", {
-                    "spec": spec, "design": plan, "current_files": source,
+                single_condition = None
+                if len(plan["targets"]) == 1:
+                    target = plan["targets"][0]
+                    tree = ast.parse(source[target["path"]])
+                    function = next((node for node in tree.body if isinstance(node, ast.FunctionDef)
+                                     and node.name == target["symbol"]), None)
+                    conditions = [node for node in function.body if isinstance(node, ast.If)] if function else []
+                    if len(conditions) == 1:
+                        single_condition = {
+                            "path": target["path"], "line": conditions[0].lineno,
+                            "condition": ast.get_source_segment(source[target["path"]], conditions[0].test),
+                        }
+                        original_conditions.setdefault(target["path"], single_condition["condition"])
+                implementation_data = {
+                    "issue": issue, "spec": spec, "design": plan, "current_files": {
+                        name: "\n".join(f"{number}: {line}" for number, line in enumerate(content.splitlines(), 1))
+                        for name, content in source.items()
+                    },
                     "previous_failure": feedback, "review_feedback": review,
-                })
+                }
+                if repair_tests_only:
+                    result = {"files": {}}
+                elif single_condition:
+                    result = model.ask("condition", {
+                        "issue": issue, "function": ast.get_source_segment(source[target["path"]], function),
+                        "current_condition": single_condition["condition"], "previous_failure": feedback,
+                        "original_condition": original_conditions[target["path"]],
+                    })
+                else:
+                    result = model.ask("implementation", implementation_data)
+                dump(directory / f"implementation-{attempt}.json", result)
+                if "else_values" in result and single_condition:
+                    values = result["else_values"]
+                    original = original_conditions[target["path"]]
+                    operand = ast.parse(original, mode="eval").body
+                    if (not isinstance(operand, (ast.Name, ast.Attribute)) or not isinstance(values, list)
+                            or not 1 <= len(values) <= 4
+                            or any(not isinstance(value, str) or len(value) > 80 for value in values)):
+                        raise Stop("Routing values need an atomic condition and one to four short strings.")
+                    result = {"expression": f"({original}) and ({original} not in {values!r})"}
+                if "expression" in result and single_condition:
+                    result = {"condition_edits": [{**single_condition, "expression": result["expression"]}]}
                 apply_files(repo, result, SOURCE, allowed)
+                for target in plan["targets"]:
+                    path = repo / target["path"]
+                    if not path.is_file() or target["symbol"] not in symbols(path):
+                        raise Stop(f"The patch is missing the planned symbol {target['symbol']} in {target['path']}.")
                 patch = git(repo, "diff", "--cached", "--binary", "HEAD")
                 (directory / "diff.patch").write_bytes(patch)
                 build = checker(repo, "build")
@@ -196,13 +374,29 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                     raise Stop(f"The wheel build failed (exit {build['exit']}).")
                 stage = "Testing"
                 test_names = [p.relative_to(repo).as_posix() for p in (repo / "tests").glob("test_autose_*.py")]
-                result = model.ask("testing", {
-                    "spec": spec, "design": plan, "previous_failure": feedback,
-                    "current_sources": read_files(repo, sorted(allowed), limit=62_000),
+                testing_data = {
+                    "issue": issue, "spec": spec, "design": plan, "previous_failure": feedback,
+                    "current_sources": read_files(repo, sorted(allowed), limit=21_000),
                     "current_tests": read_files(repo, test_names, limit=12_000),
-                })
+                }
+                if cli_extra:
+                    result = model.ask("cli-testing", {
+                        "issue": issue, "acceptance_criteria": [
+                            {"id": entry["id"], "evidence": entry["evidence"]} for entry in spec["criteria"]
+                        ], "previous_failure": feedback,
+                    })
+                else:
+                    result = model.ask("testing", testing_data)
+                dump(directory / f"testing-{attempt}.json", result)
+                if "scenarios" in result:
+                    result = {"files": {"tests/test_autose_issue.py": compile_scenarios(result["scenarios"], criteria)}}
+                elif "cli_cases" in result:
+                    result = {"files": {"tests/test_autose_issue.py": compile_cases(result["cli_cases"], criteria)}}
+                elif "test_code" in result:
+                    result = {"files": {"tests/test_autose_issue.py": result["test_code"]}}
                 apply_files(repo, result, TEST)
                 mapping = mapped_tests(repo, criteria)
+                executed_tests = True
                 report = checker(repo, "test")
                 (directory / f"pytest-{attempt}.txt").write_text(report["log"], encoding="utf-8")
                 confirm_results(report, mapping)
@@ -219,6 +413,7 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                 dump(directory / "build_status.json", {"status": "passed", "attempt": attempt})
                 return
             except Stop as error:
+                repair_tests_only = stage == "Testing" and not executed_tests
                 feedback = str(error)
                 logfile = directory / (f"build-{attempt}.txt" if stage == "Implementation" else f"pytest-{attempt}.txt")
                 if logfile.exists():

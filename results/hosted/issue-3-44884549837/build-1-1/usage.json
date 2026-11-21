@@ -1,0 +1,42 @@
+[
+  {
+    "role": "requirements",
+    "model": "autose-qwen",
+    "completion_tokens": 454,
+    "prompt_tokens": 927,
+    "total_tokens": 1381,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  {
+    "role": "design",
+    "model": "autose-qwen",
+    "completion_tokens": 224,
+    "prompt_tokens": 4669,
+    "total_tokens": 4893,
+    "prompt_tokens_details": {
+      "cached_tokens": 39
+    }
+  },
+  {
+    "role": "implementation",
+    "model": "autose-qwen",
+    "completion_tokens": 281,
+    "prompt_tokens": 1768,
+    "total_tokens": 2049,
+    "prompt_tokens_details": {
+      "cached_tokens": 39
+    }
+  },
+  {
+    "role": "implementation",
+    "model": "autose-qwen",
+    "completion_tokens": 276,
+    "prompt_tokens": 1784,
+    "total_tokens": 2060,
+    "prompt_tokens_details": {
+      "cached_tokens": 815
+    }
+  }
+]

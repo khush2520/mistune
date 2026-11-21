@@ -1,24 +1,19 @@
-kind,case,variant,expected,observed,detail,junit_cases,tokens
-baseline,mistune,offline-container,pass,pass,Wheel and full pinned suite passed.,1327,0
-D7,passing,definition-only,pass,pass,Found a function named for AC-01.,,0
-D7,passing,executed-case-gate,pass,pass,AC-01 executed and passed.,1328,0
-D7,skipped,definition-only,stop,pass,Found a function named for AC-01.,,0
-D7,skipped,executed-case-gate,stop,stop,No executed passing test for AC-01.,1328,0
-D7,failed,definition-only,stop,pass,Found a function named for AC-01.,,0
-D7,failed,executed-case-gate,stop,stop,The full suite failed or collected no tests (exit 1).,1328,0
-D7,uncollected,definition-only,stop,pass,Found a function named for AC-01.,,0
-D7,uncollected,executed-case-gate,stop,stop,No executed passing test for AC-01.,1327,0
-D7,missing,definition-only,stop,stop,Missing test definitions for AC-01.,,0
-D7,missing,executed-case-gate,stop,stop,Missing test definitions for AC-01.,1328,0
-workflow,V1,scripted,Requirements stop,Requirements stop,Clarification or a testable specification is needed before design.,,0
-workflow,F1,scripted,retry then review,retry then review,First test failed; implementation retry and independent suite passed.,,0
-D8,R1,verdict-only,approve,approve,,,0
-D8,R1,evidence-gate,approve,approve,,,0
-D8,R2,verdict-only,request_changes,approve,,,0
-D8,R2,evidence-gate,request_changes,stop,The reviewer verdict conflicts with its blocking findings.,,0
-D8,R3,verdict-only,request_changes,request_changes,,,0
-D8,R3,evidence-gate,request_changes,stop,A review finding requires a valid line at the released commit.,,0
-D8,R4,verdict-only,approve,approve,,,0
-D8,R4,evidence-gate,approve,approve,,,0
-D8,R5,verdict-only,request_changes,request_changes,,,0
-D8,R5,evidence-gate,request_changes,stop,The reviewer verdict conflicts with its blocking findings.,,0
+case,issue,variant,run_id,run_url,conclusion,requirements,design,implementation,testing,release,review,pr,ci,review_url,verdict,hidden_passed,hidden_total,tokens,note
+F1,3,initial,44779300733,https://github.com/khush2520/mistune/actions/runs/44779300733,failure,stop,skipped,skipped,skipped,skipped,skipped,,,,,,,5018,Clarification or a testable specification is needed before design.
+V1,5,initial,44779310092,https://github.com/khush2520/mistune/actions/runs/44779310092,failure,setup,skipped,skipped,skipped,skipped,skipped,,,,,,,0,Runner setup failed before requirements.
+B1,1,initial,44779316915,https://github.com/khush2520/mistune/actions/runs/44779316915,failure,stop,skipped,skipped,skipped,skipped,skipped,,,,,,,0,Local Qwen connection failed or timed out.
+B2,2,initial,44779323217,https://github.com/khush2520/mistune/actions/runs/44779323217,failure,stop,skipped,skipped,skipped,skipped,skipped,,,,,,,5103,Clarification or a testable specification is needed before design.
+F2,4,initial,44779329122,https://github.com/khush2520/mistune/actions/runs/44779329122,failure,stop,skipped,skipped,skipped,skipped,skipped,,,,,,,5095,Clarification or a testable specification is needed before design.
+F1,3,intake,44836017315,https://github.com/khush2520/mistune/actions/runs/44836017315,failure,pass,stop,skipped,skipped,skipped,skipped,,,,,,,1504,Local Qwen connection failed or timed out.
+V1,5,intake,44836022294,https://github.com/khush2520/mistune/actions/runs/44836022294,failure,stop,skipped,skipped,skipped,skipped,skipped,,,,,1,2,993,Clarification or a testable specification is needed before design.
+B1,1,intake,44836026889,https://github.com/khush2520/mistune/actions/runs/44836026889,failure,pass,pass,stop,skipped,skipped,skipped,,,,,,,19899,Replacement text for src/mistune/__main__.py must match exactly once.
+B2,2,intake,44836031767,https://github.com/khush2520/mistune/actions/runs/44836031767,failure,pass,pass,pass,stop,skipped,skipped,,,,,1,3,31555,The full suite failed or collected no tests (exit 1).
+F2,4,intake,44836037626,https://github.com/khush2520/mistune/actions/runs/44836037626,failure,pass,pass,pass,stop,skipped,skipped,,,,,2,3,26269,A model proposed an edit outside this stage's allowlist.
+F3,12,2cba295,44883878553,https://github.com/khush2520/mistune/actions/runs/44883878553,cancelled,pass,skipped,skipped,skipped,skipped,skipped,,,,,,,1613,Cancelled after the original issue #3 was restored.
+F1,3,2cba295,44884549837,https://github.com/khush2520/mistune/actions/runs/44884549837,failure,pass,pass,stop,skipped,skipped,skipped,,,,,,,10383,Replacement text for src/mistune/__main__.py must match exactly once.
+F1,3,f7875bd,44896544026,https://github.com/khush2520/mistune/actions/runs/44896544026,failure,pass,pass,stop,stop,skipped,skipped,,,,,,,14165,Proposed file src/mistune/__main__.py does not parse on line 115.
+F1,3,fbdccd7,44898264537,https://github.com/khush2520/mistune/actions/runs/44898264537,failure,pass,pass,pass,stop,skipped,skipped,,,,,,,15879,Proposed file tests/test_autose_issue.py does not parse on line 22.
+F1,3,19864dc,44900258247,https://github.com/khush2520/mistune/actions/runs/44900258247,failure,pass,pass,stop,skipped,skipped,skipped,,,,,,,12016,Expected one single-line if condition on line 36 of src/mistune/__main__.py.
+F1,3,58b066b,44924189205,https://github.com/khush2520/mistune/actions/runs/44924189205,failure,pass,pass,stop,skipped,skipped,skipped,,,,,,,11908,Expected exactly one matching single-line if condition in src/mistune/__main__.py.
+F1,3,40b43af,44925918271,https://github.com/khush2520/mistune/actions/runs/44925918271,failure,pass,pass,pass,stop,skipped,skipped,,,,,0,3,14423,The full suite failed or collected no tests (exit 1).
+F1,3,a38dd88,44927469303,https://github.com/khush2520/mistune/actions/runs/44927469303,failure,pass,pass,pass,stop,skipped,skipped,,,,,0,3,13233,The full suite failed or collected no tests (exit 1).

@@ -1,0 +1,62 @@
+[
+  {
+    "role": "requirements",
+    "model": "autose-qwen",
+    "completion_tokens": 501,
+    "prompt_tokens": 980,
+    "total_tokens": 1481,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  {
+    "role": "design",
+    "model": "autose-qwen",
+    "completion_tokens": 432,
+    "prompt_tokens": 6592,
+    "total_tokens": 7024,
+    "prompt_tokens_details": {
+      "cached_tokens": 39
+    }
+  },
+  {
+    "role": "implementation",
+    "model": "autose-qwen",
+    "completion_tokens": 145,
+    "prompt_tokens": 8256,
+    "total_tokens": 8401,
+    "prompt_tokens_details": {
+      "cached_tokens": 39
+    }
+  },
+  {
+    "role": "testing",
+    "model": "autose-qwen",
+    "completion_tokens": 208,
+    "prompt_tokens": 2592,
+    "total_tokens": 2800,
+    "prompt_tokens_details": {
+      "cached_tokens": 39
+    }
+  },
+  {
+    "role": "implementation",
+    "model": "autose-qwen",
+    "completion_tokens": 163,
+    "prompt_tokens": 8295,
+    "total_tokens": 8458,
+    "prompt_tokens_details": {
+      "cached_tokens": 39
+    }
+  },
+  {
+    "role": "testing",
+    "model": "autose-qwen",
+    "completion_tokens": 587,
+    "prompt_tokens": 2804,
+    "total_tokens": 3391,
+    "prompt_tokens_details": {
+      "cached_tokens": 1098
+    }
+  }
+]

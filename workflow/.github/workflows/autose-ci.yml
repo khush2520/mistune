@@ -15,6 +15,56 @@ permissions:
   contents: read
 
 jobs:
+  dispatch-issue:
+    if: >-
+      github.repository == vars.AUTOSE_FORK &&
+      !startsWith(github.ref, 'refs/heads/autose/issue-') &&
+      inputs.base == 'issue'
+    permissions:
+      contents: write
+      issues: read
+      pull-requests: write
+      actions: write
+    uses: ./.github/workflows/autose.yml
+    with:
+      issue_number: ${{ inputs.label }}
+
+  seeded-review:
+    if: github.repository == vars.AUTOSE_FORK && inputs.base == 'seeded'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/heads/autose-seed/r${{ matrix.case }}
+          path: candidate
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Build isolated checker
+        run: docker build -t autose-checks:local control/workflow
+      - name: Start free Qwen inference
+        run: bash control/workflow/local_model.sh
+      - name: Compare both reviewer prompts
+        env:
+          REVIEW_CASE: R${{ matrix.case }}
+        run: python3 control/experiment/review_seed.py "$REVIEW_CASE" candidate evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: seeded-R${{ matrix.case }}
+          path: evidence
+          retention-days: 90
+
   verify:
     if: startsWith(github.ref, 'refs/heads/autose/issue-') && github.repository == vars.AUTOSE_FORK
     runs-on: ubuntu-latest

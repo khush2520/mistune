@@ -1,0 +1,17 @@
+{
+  "approach": "Modify the `_output` function in `src/mistune/__main__.py` to handle the `--output -` and `-o -` options by sending the result to stdout instead of writing to a file.",
+  "architecture_fit": "This change adheres to the constraints by not altering the token contract, extending through the plugin system, and respecting the import layering. It also routes HTML output through the renderer's safety helpers implicitly.",
+  "tests": "Add unit tests in `tests/test_cli.py` to verify that `--output -` and `-o -` send the output to stdout, and that other filenames and existing files are handled correctly.",
+  "targets": [
+    {
+      "path": "src/mistune/__main__.py",
+      "symbol": "_output",
+      "action": "edit",
+      "change": "Modify the `_output` function to check if `args.output` is '-' or '-o'. If so, use `sys.stdout` instead of opening a file."
+    }
+  ],
+  "context": [
+    "src/mistune/__main__.py",
+    "tests/test_cli.py"
+  ]
+}

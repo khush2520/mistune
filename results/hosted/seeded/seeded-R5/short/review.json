@@ -1,0 +1,14 @@
+{
+  "verdict": "request_changes",
+  "return_to": "implementation",
+  "findings": [
+    {
+      "path": "src/mistune/__main__.py",
+      "line": 38,
+      "problem": "The output file is hardcoded to 'out.html' instead of using the file name provided by the user.",
+      "return_to": "implementation"
+    }
+  ],
+  "head": "852ead0befe73a4c39dcc2a6e337cfd14e63f3fa",
+  "round": 1
+}

@@ -1,0 +1,56 @@
+{
+  "cli_cases": [
+    {
+      "id": "AC-01",
+      "args": [
+        "-m",
+        "hello",
+        "--output",
+        "-"
+      ],
+      "same_stdout_as": [
+        "-m",
+        "hello"
+      ]
+    },
+    {
+      "id": "AC-02",
+      "args": [
+        "-m",
+        "hello",
+        "-o",
+        "-"
+      ],
+      "same_stdout_as": [
+        "-m",
+        "hello"
+      ]
+    },
+    {
+      "id": "AC-03",
+      "args": [
+        "-f",
+        "README.md",
+        "--output",
+        "-"
+      ],
+      "same_stdout_as": [
+        "-f",
+        "README.md"
+      ]
+    },
+    {
+      "id": "AC-04",
+      "args": [
+        "-f",
+        "README.md",
+        "-o",
+        "-"
+      ],
+      "same_stdout_as": [
+        "-f",
+        "README.md"
+      ]
+    }
+  ]
+}

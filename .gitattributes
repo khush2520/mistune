@@ -1,2 +1,3 @@
 *.patch -whitespace
 results/local/**/*.txt -whitespace
+results/hosted/**/*.txt -whitespace

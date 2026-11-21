@@ -1,0 +1,22 @@
+[
+  {
+    "role": "inspect",
+    "model": "autose-qwen",
+    "completion_tokens": 28,
+    "prompt_tokens": 1364,
+    "total_tokens": 1392,
+    "prompt_tokens_details": {
+      "cached_tokens": 1363
+    }
+  },
+  {
+    "role": "review",
+    "model": "autose-qwen",
+    "completion_tokens": 62,
+    "prompt_tokens": 2538,
+    "total_tokens": 2600,
+    "prompt_tokens_details": {
+      "cached_tokens": 39
+    }
+  }
+]

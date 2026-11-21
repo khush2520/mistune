@@ -1,0 +1,5 @@
+{
+  "status": "failed",
+  "stage": "Design",
+  "reason": "Local Qwen connection failed or timed out."
+}

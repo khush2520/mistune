@@ -1,0 +1,79 @@
+FFFF.................................................................... [  5%]
+...................................................................... [ 10%]
+........................................................................ [ 16%]
+........................................................................ [ 21%]
+........................................................................ [ 26%]
+........................................................................ [ 32%]
+........................................................................ [ 37%]
+........................................................................ [ 43%]
+........................................................................ [ 48%]
+........................................................................ [ 53%]
+........................................................................ [ 59%]
+.............................................................F.......... [ 64%]
+.................................................................... [ 69%]
+........................................................................ [ 75%]
+........................................................................ [ 80%]
+........................................................................ [ 86%]
+........................................................................ [ 91%]
+................................................................ [ 96%]
+.................................................                        [100%]
+=================================== FAILURES ===================================
+_______________________________ test_ac_01_cli_1 _______________________________
+tests/test_autose_issue.py:24: in test_ac_01_cli_1
+    assert result.stdout == reference.stdout
+E   AssertionError: assert '' == '<h2>Example</h2>\n\n'
+E     
+E     - <h2>Example</h2>
+E     -
+_______________________________ test_ac_02_cli_2 _______________________________
+tests/test_autose_issue.py:32: in test_ac_02_cli_2
+    assert result.stdout == reference.stdout
+E   AssertionError: assert '' == '<h2>Example</h2>\n\n'
+E     
+E     - <h2>Example</h2>
+E     -
+_______________________________ test_ac_03_cli_3 _______________________________
+tests/test_autose_issue.py:38: in test_ac_03_cli_3
+    assert target.read_text(encoding='utf-8') == '<p>## Example</p>'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/pathlib/_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/pathlib/_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-nobody/pytest-0/test_ac_03_cli_30/output.html'
+_______________________________ test_ac_04_cli_4 _______________________________
+tests/test_autose_issue.py:45: in test_ac_04_cli_4
+    assert target.read_text(encoding='utf-8') == 'Existing content\n<p>## Example</p>'
+E   AssertionError: assert '<h2>Example</h2>\n' == 'Existing con...# Example</p>'
+E     
+E     + <h2>Example</h2>
+E     - Existing content
+E     - <p>## Example</p>
+_________________ TestMiscCases.test_cli_output_file_uses_utf8 _________________
+tests/test_misc.py:513: in test_cli_output_file_uses_utf8
+    self.assertEqual(path.read_text(encoding="utf-8"), "★")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/pathlib/_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/pathlib/_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tmpmvc2xkvg/out.html'
+----------------------------- Captured stdout call -----------------------------
+★
+=========================== short test summary info ============================
+FAILED tests/test_autose_issue.py::test_ac_01_cli_1 - AssertionError: assert ...
+FAILED tests/test_autose_issue.py::test_ac_02_cli_2 - AssertionError: assert ...
+FAILED tests/test_autose_issue.py::test_ac_03_cli_3 - FileNotFoundError: [Err...
+FAILED tests/test_autose_issue.py::test_ac_04_cli_4 - AssertionError: assert ...
+FAILED tests/test_misc.py::TestMiscCases::test_cli_output_file_uses_utf8 - Fi...
+5 failed, 1326 passed, 158 subtests passed in 5.39s

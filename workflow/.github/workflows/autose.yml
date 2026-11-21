@@ -1,5 +1,5 @@
 name: AutoSE
-run-name: AutoSE issue #${{ github.event.issue.number }}
+run-name: AutoSE issue #${{ github.event.issue.number || inputs.issue_number }}
 
 on:
   issues:
@@ -7,27 +7,35 @@ on:
   issue_comment:
     types: [created]
 
+  workflow_call:
+    inputs:
+      issue_number:
+        required: true
+        type: string
+
 permissions: {}
 
 concurrency:
-  group: autose-issue-${{ github.event.issue.number }}
+  group: autose-issue-${{ github.event.issue.number || inputs.issue_number }}
   cancel-in-progress: false
 
 jobs:
   authorize:
     if: >-
       github.repository == vars.AUTOSE_FORK &&
-      !github.event.issue.pull_request &&
-      github.event.issue.state == 'open' &&
-      ((github.event_name == 'issues' && github.event.label.name == 'autose') ||
-       (github.event_name == 'issue_comment' &&
-        format('{0}.', github.event.comment.body) == '/autose.'))
+      (inputs.issue_number != '' ||
+       (!github.event.issue.pull_request &&
+        github.event.issue.state == 'open' &&
+        ((github.event_name == 'issues' && github.event.label.name == 'autose') ||
+         (github.event_name == 'issue_comment' && github.event.comment.body == '/autose'))))
     runs-on: ubuntu-latest
     timeout-minutes: 3
     permissions:
       contents: read
+      issues: read
     outputs:
       base: ${{ steps.intake.outputs.base }}
+      control: ${{ steps.intake.outputs.control }}
       branch: ${{ steps.intake.outputs.branch }}
       issue: ${{ steps.intake.outputs.issue }}
       intake: ${{ steps.intake.outputs.intake }}
@@ -40,6 +48,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           AUTOSE_FORK: ${{ vars.AUTOSE_FORK }}
+          AUTOSE_DISPATCH_ISSUE: ${{ inputs.issue_number }}
         run: python3 workflow/github_flow.py authorize --artifacts intake
       - uses: actions/upload-artifact@v4
         if: always()
@@ -58,11 +67,10 @@ jobs:
     with:
       round: 1
       base: ${{ needs.authorize.outputs.base }}
+      control: ${{ needs.authorize.outputs.control }}
       branch: ${{ needs.authorize.outputs.branch }}
       issue: ${{ needs.authorize.outputs.issue }}
       intake: ${{ needs.authorize.outputs.intake }}
-    secrets:
-      model_key: ${{ secrets.OPENAI_API_KEY }}
 
   second:
     needs: [authorize, first]
@@ -75,6 +83,7 @@ jobs:
     with:
       round: 2
       base: ${{ needs.authorize.outputs.base }}
+      control: ${{ needs.authorize.outputs.control }}
       branch: ${{ needs.authorize.outputs.branch }}
       issue: ${{ needs.authorize.outputs.issue }}
       intake: ${{ needs.authorize.outputs.intake }}
@@ -82,5 +91,3 @@ jobs:
       pr: ${{ needs.first.outputs.pr }}
       previous: ${{ needs.first.outputs.build }}
       feedback: ${{ needs.first.outputs.review }}
-    secrets:
-      model_key: ${{ secrets.OPENAI_API_KEY }}
