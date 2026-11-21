@@ -33,6 +33,10 @@ The original F1 issue is active again. The temporary replacement F3 was closed a
 | F1 | [#3](https://github.com/khush2520/mistune/issues/3) | 2cba295 | [2cba295 · failure](https://github.com/khush2520/mistune/actions/runs/44884549837) | — | — | — |
 | F1 | [#3](https://github.com/khush2520/mistune/issues/3) | f7875bd | [f7875bd · failure](https://github.com/khush2520/mistune/actions/runs/44896544026) | — | — | — |
 | F1 | [#3](https://github.com/khush2520/mistune/issues/3) | fbdccd7 | [fbdccd7 · failure](https://github.com/khush2520/mistune/actions/runs/44898264537) | — | — | — |
+| F1 | [#3](https://github.com/khush2520/mistune/issues/3) | 19864dc | [19864dc · failure](https://github.com/khush2520/mistune/actions/runs/44900258247) | — | — | — |
+| F1 | [#3](https://github.com/khush2520/mistune/issues/3) | 58b066b | [58b066b · failure](https://github.com/khush2520/mistune/actions/runs/44924189205) | — | — | — |
+| F1 | [#3](https://github.com/khush2520/mistune/issues/3) | 40b43af | [40b43af · failure](https://github.com/khush2520/mistune/actions/runs/44925918271) | — | — | — |
+| F1 | [#3](https://github.com/khush2520/mistune/issues/3) | a38dd88 | [a38dd88 · failure](https://github.com/khush2520/mistune/actions/runs/44927469303) | — | — | — |
 
 [Hosted issue results](results.csv) · [Local decision probes](local-probes.csv) · [Hidden baseline scores](hidden-scores.md)
 

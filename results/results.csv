@@ -13,3 +13,7 @@ F3,12,2cba295,44883878553,https://github.com/khush2520/mistune/actions/runs/4488
 F1,3,2cba295,44884549837,https://github.com/khush2520/mistune/actions/runs/44884549837,failure,pass,pass,stop,skipped,skipped,skipped,,,,,,,10383,Replacement text for src/mistune/__main__.py must match exactly once.
 F1,3,f7875bd,44896544026,https://github.com/khush2520/mistune/actions/runs/44896544026,failure,pass,pass,stop,stop,skipped,skipped,,,,,,,14165,Proposed file src/mistune/__main__.py does not parse on line 115.
 F1,3,fbdccd7,44898264537,https://github.com/khush2520/mistune/actions/runs/44898264537,failure,pass,pass,pass,stop,skipped,skipped,,,,,,,15879,Proposed file tests/test_autose_issue.py does not parse on line 22.
+F1,3,19864dc,44900258247,https://github.com/khush2520/mistune/actions/runs/44900258247,failure,pass,pass,stop,skipped,skipped,skipped,,,,,,,12016,Expected one single-line if condition on line 36 of src/mistune/__main__.py.
+F1,3,58b066b,44924189205,https://github.com/khush2520/mistune/actions/runs/44924189205,failure,pass,pass,stop,skipped,skipped,skipped,,,,,,,11908,Expected exactly one matching single-line if condition in src/mistune/__main__.py.
+F1,3,40b43af,44925918271,https://github.com/khush2520/mistune/actions/runs/44925918271,failure,pass,pass,pass,stop,skipped,skipped,,,,,0,3,14423,The full suite failed or collected no tests (exit 1).
+F1,3,a38dd88,44927469303,https://github.com/khush2520/mistune/actions/runs/44927469303,failure,pass,pass,pass,stop,skipped,skipped,,,,,0,3,13233,The full suite failed or collected no tests (exit 1).

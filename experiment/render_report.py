@@ -241,13 +241,15 @@ def render():
 
         page.page("Hindsight and validity", "What the evidence supports and what still needs measurement")
         page.heading("First change")
-        page.text("Use a brief text-proposal turn before asking the implementer for complete file bodies. Whole-file edits make the patch easy to apply locally, "
-                  "but each larger source file increases the input and output budget. A smaller verified change format could make multi-file work feasible without giving the model shell access.")
+        page.text("Start with smaller structured edits. The hosted attempts exposed invalid replacement anchors, incorrect line numbers and malformed generated tests. "
+                  "The revised editor can route model-selected values to an existing else branch, preserving both bodies. "
+                  "For CLI cases, the tester supplies arguments and expected behavior, which the runner compiles into pytest. "
+                  "The model still chooses the condition and assertions, so semantic mistakes remain possible.")
         page.heading("Limitations")
         page.text("1. One repository and four small product tasks. The current scope excludes changes to dependencies and workflow configuration, so these results do not predict performance on large changes.")
         page.text("2. The local gate experiments use scripted responses. The hosted stage rates use the latest recorded attempt for each active issue. The retired F3 case stays in the run ledger.")
         page.text("3. The fixture author also supplied the expected labels. Seeded issues emphasize cases the author anticipated. Independent labeling would reduce this bias.")
-        page.text("4. Structural checks can be satisfied by weak assertions. Test mappings and a valid line reference still need behavior-based review.")
+        page.text("4. Structural checks can accept weak assertions and inconsistent specifications. In F1, the model reversed the request to preserve a file even while its validation flags were true. Original-issue checks remain necessary.")
         page.text("5. Docker verification used a local Apple Silicon machine. Hosted runner setup, token permissions and service latency can affect a live run.")
         page.heading("Reproducibility")
         page.text("The fork includes the pinned commit, workflow copy, prompts, decision variants, run ledger and raw evidence. The hidden evaluator stays outside the candidate repository.")

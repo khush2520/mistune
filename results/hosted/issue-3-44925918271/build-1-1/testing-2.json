@@ -1,0 +1,57 @@
+{
+  "cli_cases": [
+    {
+      "id": "AC-01",
+      "args": [
+        "-m",
+        "## Example",
+        "--output",
+        "-"
+      ],
+      "same_stdout_as": [
+        "-m",
+        "## Example"
+      ]
+    },
+    {
+      "id": "AC-02",
+      "args": [
+        "-m",
+        "## Example",
+        "-o",
+        "-"
+      ],
+      "same_stdout_as": [
+        "-m",
+        "## Example"
+      ]
+    },
+    {
+      "id": "AC-03",
+      "args": [
+        "-m",
+        "## Example",
+        "--output",
+        "output.html"
+      ],
+      "file": {
+        "name": "output.html",
+        "after": "<p>## Example</p>"
+      }
+    },
+    {
+      "id": "AC-04",
+      "args": [
+        "-m",
+        "## Example",
+        "--output",
+        "-"
+      ],
+      "file": {
+        "name": "-",
+        "before": "Existing content",
+        "after": "Existing content\n<p>## Example</p>"
+      }
+    }
+  ]
+}

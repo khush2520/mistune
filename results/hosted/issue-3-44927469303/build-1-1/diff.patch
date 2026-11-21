@@ -1,0 +1,65 @@
+diff --git a/src/mistune/__main__.py b/src/mistune/__main__.py
+index 9cd4ed0..9dad0a8 100644
+--- a/src/mistune/__main__.py
++++ b/src/mistune/__main__.py
+@@ -34,7 +34,7 @@ def _md(args: argparse.Namespace) -> "Markdown":
+ 
+ 
+ def _output(text: str, args: argparse.Namespace) -> None:
+-    if args.output:
++    if args.output == '-' and not os.path.exists(args.output):
+         with open(args.output, "w", encoding="utf-8") as f:
+             f.write(text)
+     else:
+diff --git a/tests/test_autose_issue.py b/tests/test_autose_issue.py
+new file mode 100644
+index 0000000..19ca56f
+--- /dev/null
++++ b/tests/test_autose_issue.py
+@@ -0,0 +1,46 @@
++import os
++from pathlib import Path
++import subprocess
++import sys
++
++
++SOURCE = Path(__file__).resolve().parents[1] / "src"
++
++
++def invoke(args, cwd):
++    return subprocess.run(
++        [sys.executable, "-m", "mistune", *args], cwd=cwd,
++        env={**os.environ, "PYTHONPATH": str(SOURCE)},
++        input="", capture_output=True, encoding="utf-8", timeout=10,
++    )
++
++
++def test_ac_01_cli_1(tmp_path):
++    reference = invoke(['-m', 'hello'], tmp_path)
++    assert reference.returncode == 0
++    assert reference.stdout
++    result = invoke(['-m', 'hello', '--output', '-'], tmp_path)
++    assert result.returncode == 0, result.stderr
++    assert result.stdout == reference.stdout
++
++def test_ac_02_cli_2(tmp_path):
++    reference = invoke(['-f', 'README.md'], tmp_path)
++    assert reference.returncode == 0
++    assert reference.stdout
++    result = invoke(['-f', 'README.md', '--output', '-'], tmp_path)
++    assert result.returncode == 0, result.stderr
++    assert result.stdout == reference.stdout
++
++def test_ac_03_cli_3(tmp_path):
++    reference = invoke(['-o', '-'], tmp_path)
++    assert reference.returncode == 0
++    assert reference.stdout
++    result = invoke(['-o', '-', '--output', '-'], tmp_path)
++    assert result.returncode == 0, result.stderr
++    assert result.stdout == reference.stdout
++
++def test_ac_04_cli_4(tmp_path):
++    target = tmp_path / 'output.txt'
++    result = invoke(['-m', 'hello', '-o', 'output.txt'], tmp_path)
++    assert result.returncode == 0, result.stderr
++    assert target.read_text(encoding='utf-8') == '<p>hello</p>\n'

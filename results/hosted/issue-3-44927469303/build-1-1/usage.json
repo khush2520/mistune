@@ -1,0 +1,62 @@
+[
+  {
+    "role": "requirements",
+    "model": "autose-qwen",
+    "completion_tokens": 566,
+    "prompt_tokens": 978,
+    "total_tokens": 1544,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  {
+    "role": "design",
+    "model": "autose-qwen",
+    "completion_tokens": 250,
+    "prompt_tokens": 4835,
+    "total_tokens": 5085,
+    "prompt_tokens_details": {
+      "cached_tokens": 39
+    }
+  },
+  {
+    "role": "condition",
+    "model": "autose-qwen",
+    "completion_tokens": 9,
+    "prompt_tokens": 344,
+    "total_tokens": 353,
+    "prompt_tokens_details": {
+      "cached_tokens": 39
+    }
+  },
+  {
+    "role": "cli-testing",
+    "model": "autose-qwen",
+    "completion_tokens": 203,
+    "prompt_tokens": 1493,
+    "total_tokens": 1696,
+    "prompt_tokens_details": {
+      "cached_tokens": 39
+    }
+  },
+  {
+    "role": "condition",
+    "model": "autose-qwen",
+    "completion_tokens": 17,
+    "prompt_tokens": 1598,
+    "total_tokens": 1615,
+    "prompt_tokens_details": {
+      "cached_tokens": 282
+    }
+  },
+  {
+    "role": "cli-testing",
+    "model": "autose-qwen",
+    "completion_tokens": 191,
+    "prompt_tokens": 2749,
+    "total_tokens": 2940,
+    "prompt_tokens_details": {
+      "cached_tokens": 509
+    }
+  }
+]

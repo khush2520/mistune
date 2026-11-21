@@ -1,0 +1,9 @@
+{
+  "condition_edits": [
+    {
+      "path": "src/mistune/__main__.py",
+      "condition": "args.output == '-' or args.output == '-o'",
+      "expression": "sys.stdout.write(text)"
+    }
+  ]
+}
