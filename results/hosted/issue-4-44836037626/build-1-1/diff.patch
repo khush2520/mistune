@@ -1,0 +1,28 @@
+diff --git a/src/mistune/toc.py b/src/mistune/toc.py
+index 1490366..4ac54b7 100644
+--- a/src/mistune/toc.py
++++ b/src/mistune/toc.py
+@@ -101,7 +101,7 @@ def normalize_toc_item(md: "Markdown", token: Dict[str, Any], parent: Optional[A
+     return attrs["level"], attrs["id"], text
+ 
+ 
+-def render_toc_ul(toc: Iterable[Tuple[int, str, str]]) -> str:
++def render_toc_ul(toc: Iterable[Tuple[int, str, str]], css_class: Optional[str] = None) -> str:
+     """Render a <ul> table of content HTML. The param "toc" should
+     be formatted into this structure::
+ 
+@@ -121,7 +121,7 @@ def render_toc_ul(toc: Iterable[Tuple[int, str, str]]) -> str:
+     if not toc:
+         return ""
+ 
+-    s = ""
++    s = "" if css_class is None else "<ul class='{}'>".format(css_class)
+     levels: List[int] = []
+     for level, k, text in toc:
+         item = '<a href="#{}">{}</a>'.format(escape(k), text)
+@@ -158,4 +158,4 @@ def render_toc_ul(toc: Iterable[Tuple[int, str, str]]) -> str:
+ 
+     if not s:
+         return ""
+-    return "<ul>\n" + s + "</li>\n</ul>\n"
++    return s + "</ul>\n" if css_class is None else s

@@ -1,0 +1,46 @@
+FFFF.................................................................... [  5%]
+...................................................................... [ 10%]
+........................................................................ [ 16%]
+........................................................................ [ 21%]
+........................................................................ [ 26%]
+........................................................................ [ 32%]
+........................................................................ [ 37%]
+........................................................................ [ 43%]
+........................................................................ [ 48%]
+........................................................................ [ 53%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+.................................................................... [ 69%]
+........................................................................ [ 75%]
+........................................................................ [ 80%]
+........................................................................ [ 86%]
+........................................................................ [ 91%]
+................................................................ [ 96%]
+.................................................                        [100%]
+=================================== FAILURES ===================================
+_______ test_add_toc_hook[<div data-id="toc_1"></div>\n# Heading-toc_1] ________
+tests/test_autose_add_toc_hook.py:9: in test_add_toc_hook
+    md = mistune.create_markdown()
+         ^^^^^^^
+E   NameError: name 'mistune' is not defined
+_________ test_add_toc_hook[<div id="toc_1"></div>\n# Heading-toc_1_1] _________
+tests/test_autose_add_toc_hook.py:9: in test_add_toc_hook
+    md = mistune.create_markdown()
+         ^^^^^^^
+E   NameError: name 'mistune' is not defined
+_____________________ test_ac_01_toc_id_kept_if_no_real_id _____________________
+tests/test_autose_add_toc_hook.py:18: in test_ac_01_toc_id_kept_if_no_real_id
+    md = mistune.create_markdown()
+         ^^^^^^^
+E   NameError: name 'mistune' is not defined
+_______________ test_ac_02_toc_id_with_suffix_if_real_id_exists ________________
+tests/test_autose_add_toc_hook.py:27: in test_ac_02_toc_id_with_suffix_if_real_id_exists
+    md = mistune.create_markdown()
+         ^^^^^^^
+E   NameError: name 'mistune' is not defined
+=========================== short test summary info ============================
+FAILED tests/test_autose_add_toc_hook.py::test_add_toc_hook[<div data-id="toc_1"></div>\n# Heading-toc_1]
+FAILED tests/test_autose_add_toc_hook.py::test_add_toc_hook[<div id="toc_1"></div>\n# Heading-toc_1_1]
+FAILED tests/test_autose_add_toc_hook.py::test_ac_01_toc_id_kept_if_no_real_id
+FAILED tests/test_autose_add_toc_hook.py::test_ac_02_toc_id_with_suffix_if_real_id_exists
+4 failed, 1327 passed, 158 subtests passed in 4.29s

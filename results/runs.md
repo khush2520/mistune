@@ -1,22 +1,26 @@
 # Run ledger
 
-## Hosted issue inputs
+Hosted model inference ran on free public GitHub Actions runners using Qwen2.5-Coder-7B-Instruct.
+These links include stopped attempts. A vague issue stopping with actionable questions is an expected result.
 
-| Case | Issue | Actions run | PR | Review |
-| --- | --- | --- | --- | --- |
-| B1 | [#1](https://github.com/khush2520/mistune/issues/1) | Pending | — | — |
-| B2 | [#2](https://github.com/khush2520/mistune/issues/2) | Pending | — | — |
-| F1 | [#3](https://github.com/khush2520/mistune/issues/3) | Pending | — | — |
-| F2 | [#4](https://github.com/khush2520/mistune/issues/4) | Pending | — | — |
-| V1 | [#5](https://github.com/khush2520/mistune/issues/5) | Pending | — | — |
+| Case | Issue | Attempt | Actions | PR | CI | Posted review |
+| --- | --- | --- | --- | --- | --- | --- |
+| B1 | [#1](https://github.com/khush2520/mistune/issues/1) | initial | [initial · failure](https://github.com/khush2520/mistune/actions/runs/44779316915) | — | — | — |
+| B1 | [#1](https://github.com/khush2520/mistune/issues/1) | intake | [intake · failure](https://github.com/khush2520/mistune/actions/runs/44836026889) | — | — | — |
+| B2 | [#2](https://github.com/khush2520/mistune/issues/2) | initial | [initial · failure](https://github.com/khush2520/mistune/actions/runs/44779323217) | — | — | — |
+| B2 | [#2](https://github.com/khush2520/mistune/issues/2) | intake | [intake · failure](https://github.com/khush2520/mistune/actions/runs/44836031767) | — | — | — |
+| F1 | [#3](https://github.com/khush2520/mistune/issues/3) | initial | [initial · failure](https://github.com/khush2520/mistune/actions/runs/44779300733) | — | — | — |
+| F1 | [#3](https://github.com/khush2520/mistune/issues/3) | intake | [intake · failure](https://github.com/khush2520/mistune/actions/runs/44836017315) | — | — | — |
+| F2 | [#4](https://github.com/khush2520/mistune/issues/4) | initial | [initial · failure](https://github.com/khush2520/mistune/actions/runs/44779329122) | — | — | — |
+| F2 | [#4](https://github.com/khush2520/mistune/issues/4) | intake | [intake · failure](https://github.com/khush2520/mistune/actions/runs/44836037626) | — | — | — |
+| V1 | [#5](https://github.com/khush2520/mistune/issues/5) | initial | [initial · failure](https://github.com/khush2520/mistune/actions/runs/44779310092) | — | — | — |
+| V1 | [#5](https://github.com/khush2520/mistune/issues/5) | intake | [intake · failure](https://github.com/khush2520/mistune/actions/runs/44836022294) | — | — | — |
 
-The hosted model key and provider spending limit must be ready before the five issue runs. The local checks use zero API tokens.
-
-## Local evidence
-
-The local probes use an offline Docker container and authored model responses. [Results CSV](results.csv) · [Raw local evidence](local/).
+[Hosted issue results](results.csv) · [Local decision probes](local-probes.csv) · [Hidden baseline scores](hidden-scores.md)
 
 ## Seeded reviewer cases
+
+[Hosted comparison run](https://github.com/khush2520/mistune/actions/runs/44787096358) · [Reviewer results](hosted/seeded.csv) · [CLI behavior checks](seed-validation.md)
 
 | Case | Draft PR |
 | --- | --- |
@@ -26,4 +30,8 @@ The local probes use an offline Docker container and authored model responses. [
 | R4 | [#9](https://github.com/khush2520/mistune/pull/9) |
 | R5 | [#10](https://github.com/khush2520/mistune/pull/10) |
 
-These draft PRs are evaluator fixtures. The local D8 measurements used the matching diffs and scripted reviewer responses. The [behavior checks](seed-validation.md) confirm the expected labels against the CLI.
+## Dispatch block
+
+After the two issue cohorts and the seeded reviewer comparison, GitHub rejected the compact revision's dispatch with HTTP 422, “Actions has been disabled for this repository.” The Actions permissions endpoint returned `enabled: true`, both workflows were `active`, and a later attempt returned the same error. GitHub did not create a run URL for either rejected request. The report keeps hosted PR and posted-review counts at zero.
+
+B2 and F2 are scored against the candidate patches saved when testing stopped. Their patches were evaluated offline and were not released. V1 asked for an input example and the desired table, then stopped. The punctuation check in the hidden evaluator required a question mark, which the request did not have.

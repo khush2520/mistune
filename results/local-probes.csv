@@ -1,0 +1,24 @@
+kind,case,variant,expected,observed,detail,junit_cases,tokens
+baseline,mistune,offline-container,pass,pass,Wheel and full pinned suite passed.,1327,0
+D7,passing,definition-only,pass,pass,Found a function named for AC-01.,,0
+D7,passing,executed-case-gate,pass,pass,AC-01 executed and passed.,1328,0
+D7,skipped,definition-only,stop,pass,Found a function named for AC-01.,,0
+D7,skipped,executed-case-gate,stop,stop,No executed passing test for AC-01.,1328,0
+D7,failed,definition-only,stop,pass,Found a function named for AC-01.,,0
+D7,failed,executed-case-gate,stop,stop,The full suite failed or collected no tests (exit 1).,1328,0
+D7,uncollected,definition-only,stop,pass,Found a function named for AC-01.,,0
+D7,uncollected,executed-case-gate,stop,stop,No executed passing test for AC-01.,1327,0
+D7,missing,definition-only,stop,stop,Missing test definitions for AC-01.,,0
+D7,missing,executed-case-gate,stop,stop,Missing test definitions for AC-01.,1328,0
+workflow,V1,scripted,Requirements stop,Requirements stop,Clarification or a testable specification is needed before design.,,0
+workflow,F1,scripted,retry then review,retry then review,First test failed; implementation retry and independent suite passed.,,0
+D8,R1,verdict-only,approve,approve,,,0
+D8,R1,evidence-gate,approve,approve,,,0
+D8,R2,verdict-only,request_changes,approve,,,0
+D8,R2,evidence-gate,request_changes,stop,The reviewer verdict conflicts with its blocking findings.,,0
+D8,R3,verdict-only,request_changes,request_changes,,,0
+D8,R3,evidence-gate,request_changes,stop,A review finding requires a valid line at the released commit.,,0
+D8,R4,verdict-only,approve,approve,,,0
+D8,R4,evidence-gate,approve,approve,,,0
+D8,R5,verdict-only,request_changes,request_changes,,,0
+D8,R5,evidence-gate,request_changes,stop,The reviewer verdict conflicts with its blocking findings.,,0

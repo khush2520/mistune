@@ -1,0 +1,12 @@
+[
+  {
+    "role": "requirements",
+    "model": "autose-qwen",
+    "completion_tokens": 414,
+    "prompt_tokens": 4689,
+    "total_tokens": 5103,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  }
+]

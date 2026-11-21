@@ -23,8 +23,8 @@ The workflow now runs Qwen2.5-Coder-7B-Instruct locally on the standard Actions 
 - [Report](report.pdf)
 - [Architecture](architecture/views/components.md), [sequence](architecture/views/sequence.md), [stage map](architecture/views/stage-map.md) and [decisions](architecture/decisions/)
 - [Issue texts](experiment/issues/), [seeded cases](experiment/seeded_prs/) and [experiment variants](experiment/variants.md)
-- [Run ledger](results/runs.md) and [measured local results](results/results.csv)
-- [Local verification video](demo-local.mp4) shows issue F1 and the recorded Docker probe. The hosted demo needs a live posted review.
+- [Run ledger](results/runs.md) and [hosted results](results/results.csv)
+- [Demo video](demo.mp4) shows the F1 local verification and the hosted seeded-review run.
 
 Repeat the local decision probes with Docker running.
 
@@ -34,6 +34,10 @@ python3 experiment/measure.py /tmp/autose-results
 ```
 
 Use a fresh output directory. These probes use scripted model responses, which makes the checks repeatable. The independent reviewer in the hosted flow receives the issue, diff and files from the released commit. It can run the fixed build and full test suite in the same isolation as CI.
+
+## Hosted run status
+
+The hosted reviewer experiment finished on all five seeded PRs. Each concrete issue reached at least requirements in the later cohort, and the vague issue stopped to request an example. GitHub rejected the next dispatch with HTTP 422 even though repository Actions permissions show enabled and the workflows show active. The ledger records the stopped runs and the missing hosted release and review. [Run ledger](results/runs.md) · [GitHub Actions settings guidance](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository)
 
 ## AI assistance
 

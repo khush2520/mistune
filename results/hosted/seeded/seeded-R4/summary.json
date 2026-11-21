@@ -1,0 +1,18 @@
+[
+  {
+    "case": "R4",
+    "variant": "rubric",
+    "head": "6397eae39b7cb350934b8ef663eb1b4e833bc89d",
+    "verdict": "approve",
+    "detail": "",
+    "tokens": 3897
+  },
+  {
+    "case": "R4",
+    "variant": "short",
+    "head": "6397eae39b7cb350934b8ef663eb1b4e833bc89d",
+    "verdict": "approve",
+    "detail": "",
+    "tokens": 3910
+  }
+]

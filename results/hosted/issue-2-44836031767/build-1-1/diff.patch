@@ -1,0 +1,35 @@
+diff --git a/src/mistune/toc.py b/src/mistune/toc.py
+index 1490366..fbb9fe6 100644
+--- a/src/mistune/toc.py
++++ b/src/mistune/toc.py
+@@ -57,6 +57,10 @@ def add_toc_hook(
+         for i, tok in enumerate(headings):
+             if not tok["attrs"].get("id"):
+                 value = heading_id(tok, i)
++                if tok.get("attrs", {}).get("data-id") == value:
++                    value += "_1"
++                elif tok.get("attrs", {}).get("id") == value:
++                    value += "_1"
+                 id_allocator.assign(tok, value, ensure_unique=auto_heading_id)
+             toc_items.append(normalize_toc_item(md, tok, parent=state))
+ 
+diff --git a/tests/test_autose_add_toc_hook.py b/tests/test_autose_add_toc_hook.py
+new file mode 100644
+index 0000000..4cbbd4d
+--- /dev/null
++++ b/tests/test_autose_add_toc_hook.py
+@@ -0,0 +1,14 @@
++import pytest
++from mistune.toc import add_toc_hook, normalize_toc_item
++
++@pytest.mark.parametrize('input_html, expected_id', [
++    ('<div data-id="toc_1"></div>\n# Heading', 'toc_1'),
++    ('<div id="toc_1"></div>\n# Heading', 'toc_1_1')
++])
++def test_add_toc_hook(input_html, expected_id):
++    md = mistune.create_markdown()
++    add_toc_hook(md)
++    html, state = md.parse(input_html)
++    toc_items = state.env['toc_items']
++    assert len(toc_items) == 1
++    assert toc_items[0][1] == expected_id

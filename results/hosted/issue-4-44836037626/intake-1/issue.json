@@ -1,0 +1,5 @@
+{
+  "number": 4,
+  "title": "Add an optional CSS class to the outer TOC list",
+  "body": "I'm using `mistune.toc.render_toc_ul` and want to target one table of contents in CSS without adding another wrapper. Could it take a keyword argument `css_class` that puts a class attribute on the outer `<ul>` only? The default output should stay byte-for-byte the same, including the empty string for an empty TOC. Please handle class values like `docs toc` and quote characters as HTML attribute text."
+}

@@ -89,9 +89,7 @@ def design(data, repo, index, directory):
         lines.append(f"- `{path}` · `{symbol}` ({action}) — {change}")
     context = list_of_strings(data, "context")
     project_files = {name for name in tracked(repo) if name.startswith(("src/mistune/", "tests/"))}
-    if len(context) > 4 or any(name not in project_files for name in context):
-        raise Stop("Design context must name at most four tracked files.")
-    read_files(repo, context)
+    data["context"] = [name for name in dict.fromkeys(context) if name in project_files][:4]
     markdown(directory / "design.md", "Design", "\n".join([
         approach, "", "## Architecture fit", "", fit, "", "## File and symbol plan", "",
         *lines, "", "## Test approach", "", checks,
@@ -178,6 +176,23 @@ def stage_error(directory, stage, reason):
     dump(directory / "build_status.json", {"status": "failed", "stage": stage, "reason": reason})
 
 
+def issue_source_matches(repo, issue, paths):
+    text = str(issue.get("title", "")) + "\n" + str(issue.get("body", ""))
+    flags = re.findall(r"(?<![\w-])--[a-z][a-z0-9-]+", text)
+    references = re.findall(r"`((?:[A-Za-z_]\w*\.)*[A-Za-z_]\w*)`", text)
+    terms = list(dict.fromkeys([*flags, *(name.rsplit(".", 1)[-1] for name in references)]))[:8]
+    matches = {}
+    for name in paths:
+        source = safe_path(repo, name).read_text(encoding="utf-8")
+        lines = [f"{i}: {line.strip()}" for i, line in enumerate(source.splitlines(), 1)
+                 if any(term in line for term in terms)]
+        if lines:
+            matches[name] = lines[:4]
+        if len(matches) == 6:
+            break
+    return matches
+
+
 def architecture_context(repo):
     architecture = (repo / "ARCHITECTURE.md").read_text(encoding="utf-8")
     overview = architecture.split("## 2. Architecture", 1)[0]
@@ -211,9 +226,9 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
         else:
             plan = model.ask("design", {
                 "issue": issue, "spec": spec, "review_feedback": review,
-                "architecture": architecture_context(repo), "source_index": {
-                    path: names[:14] for path, names in index.items()
-                },
+                "architecture": architecture_context(repo),
+                "issue_source_matches": issue_source_matches(repo, issue, index),
+                "source_index": {path: names[:14] for path, names in index.items()},
             })
         allowed = design(plan, repo, index, directory)
         feedback = ""

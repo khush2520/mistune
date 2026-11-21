@@ -1,5 +1,6 @@
 """Render the seven-page A3 report with matplotlib."""
 
+import csv
 import os
 import textwrap
 from pathlib import Path
@@ -92,7 +93,30 @@ class Report:
         plt.close(self.figure)
 
 
+
+def hosted_results():
+    with (ROOT / "results/results.csv").open(newline="") as stream:
+        issues = list(csv.DictReader(stream))
+    with (ROOT / "results/hosted/seeded.csv").open(newline="") as stream:
+        seeded = list(csv.DictReader(stream))
+    latest = {}
+    for row in issues:
+        latest[row["case"]] = row
+    completed = [row for row in latest.values() if row["conclusion"] in {"success", "failure"}]
+    stages = ("requirements", "design", "implementation", "testing", "release", "review")
+    rates = []
+    for stage in stages:
+        reached = [row for row in completed if row[stage] in {"pass", "stop"}]
+        passed = sum(row[stage] == "pass" for row in reached)
+        rates.append((stage.title(), f"{passed}/{len(reached)}" if reached else "—"))
+    hidden = ", ".join(f"{case} {row['hidden_passed']}/{row['hidden_total']}"
+                       for case, row in sorted(latest.items()) if row["hidden_total"])
+    totals = sum(int(row["tokens"]) for row in issues + seeded)
+    review = next((row for row in reversed(issues) if row["review_url"]), None)
+    return rates, hidden, totals, review
+
 def render():
+    rates, hidden, tokens, live_review = hosted_results()
     with PdfPages(ROOT / "report.pdf", metadata={"Title": "AutoSE 3 · Issue to reviewed pull request"}) as pdf:
         page = Report(pdf)
         page.page("From issue to reviewed PR", "Architecture view 1 · Components, operations and permission boundaries")
@@ -107,15 +131,21 @@ def render():
             ("Review publisher", "A separate job records the verdict. A maintainer decides."),
         ])
         page.heading("Where credentials live")
-        page.text("Only model steps receive the OpenAI secret. The release job has Contents, Pull requests, and Actions write permissions. "
+        page.text("Build and review each start a loopback Qwen process. The release job has Contents, Pull requests, and Actions write permissions. "
                   "The review job has Contents read. Its publisher can post a review. Generated code runs in an offline container with a product-only source tree.")
         page.finish()
 
         page.page("What runs, in order", "Architecture views 2 and 3 · F1 sequence and artifact hand-offs")
-        page.heading("A recorded local F1 run")
-        page.text("The F1 issue asks the CLI to send output to stdout for -o -. In the Docker-backed local probe, the first wheel built but "
-                  "the added test failed because the candidate still wrote to the dash file. A second implementation added the intended condition. "
-                  "The suite then passed, and a fresh reviewer context requested its own build and tests before recording a fixture approval.")
+        if live_review:
+            page.heading(f"Recorded hosted run · {live_review['case']}")
+            page.text(f"GitHub Actions run {live_review['run_id']} took the issue through requirements, "
+                      "design, implementation and testing. The release job pushed the checked patch and waited on same-head CI. "
+                      f"The independent review posted its verdict on the pull request.")
+        else:
+            page.heading("Recorded local run · F1")
+            page.text("The first wheel built but the new test failed because the CLI still wrote to the dash file. "
+                      "The retry fixed the condition. A fresh reviewer context requested an independent build and tests. "
+                      "The view records a local scripted run while the hosted trials are tracked in the ledger.")
         page.table(["Stage", "Role", "Artifact", "Gate"], [
             ("Requirements", "A1 agent", "spec.md", "Testable criteria and no unresolved decision"),
             ("Design", "A2 designer", "design.md", "Valid paths and named symbols"),
@@ -142,9 +172,11 @@ def render():
             ("008", "Fresh review job", "Shared model context", "Review the patch on its own evidence", "Used"),
             ("009", "Bounded offline runner", "Prompt controls only", "Restrict what generated code can do", "Used"),
             ("010", "Write check + queue", "Author association", "Check real repo permission", "Used"),
-            ("011", "GPT-5.4 mini", "Deprecated snapshot", "Use an available pinned model ID", "Used"),
+            ("011", "GPT-5.4 mini API", "Deprecated snapshot", "Use a pinned API model", "Replaced"),
+            ("012", "Qwen on public CPU", "Remote model API", "Set provider inference spend to $0", "Used"),
+            ("013", "Compact A1 intake", "Full A1 prompt", "Avoid questions already answered by the issue", "Used"),
         ], [.062, .209, .175, .288, .096])
-        page.text("ADR 006 was superseded when the provider listed its chosen snapshot as deprecated. ADR 011 keeps the same-model design and changes the snapshot.")
+        page.text("ADR 012 replaces the paid API option. ADR 013 records the intake change after the first hosted attempts.")
         page.finish()
 
         page.page("Three decisions that mattered", "How prior work informed the design")
@@ -160,10 +192,10 @@ def render():
         page.heading("D8 · Give the reviewer a separate job")
         page.text("The reviewer sees the issue, final diff and files from the checked-out commit. It can ask for an isolated rerun. "
                   "The builder's spec, design, reports and conversation stay out of the review context. Its output has to cite concrete lines when asking for changes.")
-        page.text("Implementation and review start separate calls to the same snapshot. That controls one experimental variable, while correlated model mistakes remain possible.")
+        page.text("Implementation and review use separate loopback inference processes with the same pinned Qwen weights. This keeps the model fixed. Correlated mistakes remain possible.")
         page.finish()
 
-        page.page("Decision experiments", "Paired local checks on the same inputs and the same runner")
+        page.page("Decision experiments", "Paired gate checks and a hosted reviewer comparison")
         page.table(["Probe", "Comparison", "Observed result"], [
             ("D7 · Five test cases", "Test definition only", "2/5 correct gate decisions. The skip, failure and uncollected test were accepted."),
             ("D7 · Same tests", "Definition + executed case", "5/5 correct. Only the real passing case advanced."),
@@ -176,25 +208,33 @@ def render():
         page.heading("D8 · An invalid response is a distinct outcome")
         page.text("A reply claimed approval while listing a blocking problem. A second cited a line beyond the file. A third asked for changes without a finding. "
                   "The publisher must never receive these as valid verdicts. The evidence gate stopped all three.")
-        page.text("The experiment used authored replies and fixed diffs. It measures the validator's behavior. A live model comparison is needed to estimate missed regressions and false alarms.")
+        page.text("A live Qwen trial compared the full and terse reviewer prompts on the same five draft PRs. Both scored 3/5. Each caught the hardcoded filename in R5. Both missed R2 overwriting the dash file and R3 accepting empty stdin.")
+        page.text("Keep the evidence gate. The five cases did not justify a model or prompt change. A focused regression check would provide more targeted evidence than a passing baseline alone.")
         page.finish()
 
-        page.page("Results", "Local checks are recorded separately from hosted trials")
-        page.table(["Local stage", "Count", "Evidence"], [
-            ("Requirements", "1 / 2 passed", "F1 advanced; V1 produced questions and stopped."),
-            ("Design", "1 / 1 passed", "The CLI plan named _output."),
-            ("Implementation", "1 / 1 passed", "Both F1 wheel builds succeeded."),
-            ("Testing", "1 / 1 after retry", "Attempt one failed; attempt two passed 1,328 tests."),
-            ("Release", "0 hosted checks in local probe", "The patch passed local validation."),
-            ("Review", "1 / 1 scripted", "Fresh build and tests passed; fixture verdict recorded."),
-        ], [.21, .24, .38])
-        page.heading("Baseline and held-out cases")
-        page.text("The unmodified baseline passed 1,327 tests and 158 subtests in Docker. The F1 local candidate passed all three hidden tests after retry, "
-                  "compared with one of three on the baseline. The V1 local intake passed both artifact-based checks for clarification.")
-        page.text("Baseline hidden scores for B1, B2 and F2 were 0/3, 1/3 and 0/3 respectively. Those baseline measurements establish that these suites exercise the issue gaps.")
-        page.heading("Hosted evidence")
-        page.text("The run ledger records the hosted links and status as they become available. All decision experiments in this report used zero provider tokens. "
-                  "The reviewer-output faults reported on the previous page came from fixtures.")
+        page.page("Results", "Latest hosted attempt per issue and the independent evaluator")
+        page.table(["Stage", "Passed / reached", "Check"], [
+            (stage, rate, note) for (stage, rate), note in zip(rates, [
+                "Testable spec ready to hand off",
+                "Paths and symbols validated",
+                "Wheel built on the candidate",
+                "Full suite and mapped cases passed",
+                "PR open and CI green at its head",
+                "Independent verdict posted",
+            ])
+        ], [.25, .24, .34])
+        page.heading("Held-out checks")
+        page.text("The pinned baseline passed 1,327 tests and 158 subtests. The local F1 candidate passed all three hidden cases. "
+                  "The V1 hidden checks evaluate the requirements artifact because an ambiguous issue should stop before release.")
+        page.text("Hosted hidden scores were recorded as follows. " + (hidden or "No held-out score was available when this report was generated."))
+        page.heading("Hosted observations")
+        if live_review:
+            page.text(f"{live_review['case']} produced a tested PR with a posted {live_review['verdict'].replace('_', ' ')} verdict. "
+                      "The run ledger links to the issue, CI and review.")
+        else:
+            page.text("The initial model repeatedly requested details already given in the issue. The compact intake cleared four concrete issues on the next attempt. Subsequent gates stopped on model or test failures. GitHub then refused new dispatches with HTTP 422, leaving release and review unverified for issue runs.")
+        page.text(f"Qwen reported {tokens:,} tokens across the hosted issue and seeded-review runs. Total paid model spend was $0. "
+                  "Requests that timed out without returning usage are excluded from the token count.")
         page.finish()
 
         page.page("Hindsight and validity", "What the evidence supports and what still needs measurement")
@@ -203,7 +243,7 @@ def render():
                   "but each larger source file increases the input and output budget. A smaller verified change format could make multi-file work feasible without giving the model shell access.")
         page.heading("Limitations")
         page.text("1. One repository and four small product tasks. The current scope excludes changes to dependencies and workflow configuration, so these results do not predict performance on large changes.")
-        page.text("2. Scripted local responses. They exercise the implementation, routing and validation, while a live model may choose other paths or miss a real regression.")
+        page.text("2. The local gate experiments use scripted responses. The hosted cohort tests live model behavior on five code changes. Those results have different denominators.")
         page.text("3. The fixture author also supplied the expected labels. Seeded issues emphasize cases the author anticipated. Independent labeling would reduce this bias.")
         page.text("4. Structural checks can be satisfied by weak assertions. Test mappings and a valid line reference still need behavior-based review.")
         page.text("5. Docker verification used a local Apple Silicon machine. Hosted runner setup, token permissions and service latency can affect a live run.")

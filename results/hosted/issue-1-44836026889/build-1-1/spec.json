@@ -1,0 +1,53 @@
+{
+  "status": "ready",
+  "summary": "An explicitly empty message should work in the CLI",
+  "actors": [
+    "User"
+  ],
+  "constraints": [
+    "The command should succeed when an empty string is passed as the message.",
+    "The command should produce the same empty rendered result as an empty Markdown file.",
+    "When passing an explicit message along with a file, the message should still win, even when the message is empty."
+  ],
+  "assumptions": [
+    "The current behavior is that passing an empty string as the message causes an error.",
+    "The current behavior is that passing an explicit message along with a file results in the file being rendered with the message content."
+  ],
+  "questions": [],
+  "criteria": [
+    {
+      "id": "AC-01",
+      "requirement": "FR-01",
+      "evidence": "My script sometimes calls `python -m mistune --message \"\"` when a template has nothing in it.",
+      "provenance": "inferred",
+      "given": "The user runs `python -m mistune --message \"\"`",
+      "when": "the command is executed",
+      "then": "the command should succeed and produce an empty rendered result."
+    },
+    {
+      "id": "AC-02",
+      "requirement": "FR-02",
+      "evidence": "I want the command to succeed and produce the same empty rendered result as an empty Markdown file.",
+      "provenance": "inferred",
+      "given": "The user runs `python -m mistune --message \"\" --output result.html`",
+      "when": "the command is executed",
+      "then": "an empty file named `result.html` should be created."
+    },
+    {
+      "id": "AC-03",
+      "requirement": "FR-03",
+      "evidence": "If I pass an explicit message along with a file, the message should still win, even when the message is empty.",
+      "provenance": "inferred",
+      "given": "The user runs `python -m mistune --message \"\" --output result.html --message \"Hello, World!\"`",
+      "when": "the command is executed",
+      "then": "the file `result.html` should contain the content \"Hello, World!\"."
+    }
+  ],
+  "checks": {
+    "completeness": true,
+    "consistency": true,
+    "traceability": true,
+    "feasibility": true,
+    "testability": true
+  }
+}
