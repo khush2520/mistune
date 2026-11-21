@@ -46,6 +46,6 @@ F3 replaced the original stdout-dash issue F1 after the hosted cohort below. F1'
 
 ## Dispatch block
 
-After the two issue cohorts and the seeded reviewer comparison, GitHub rejected the compact revision's dispatch with HTTP 422, “Actions has been disabled for this repository.” The Actions permissions endpoint returned `enabled: true`, both workflows were `active`, and a later attempt returned the same error. GitHub did not create a run URL for either rejected request. The report keeps hosted PR and posted-review counts at zero.
+After the two issue cohorts and the seeded reviewer comparison, GitHub rejected the compact revision's dispatch with HTTP 422, “Actions has been disabled for this repository.” The Actions permissions endpoint returned `enabled: true`, both workflows were `active`, and a later attempt returned the same error. The attempted dispatch for replacement issue #12 returned the same HTTP 422. GitHub did not create a run URL for those requests. The report keeps hosted PR and posted-review counts at zero.
 
 B2 and F2 are scored against the candidate patches saved when testing stopped. Their patches were evaluated offline and were not released. V1 asked for an input example and the desired table, then stopped. The punctuation check in the hidden evaluator required a question mark, which the request did not have.
