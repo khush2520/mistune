@@ -41,7 +41,7 @@ Use a fresh output directory. These probes use scripted model responses, which m
 
 ## Hosted run status
 
-The hosted reviewer experiment finished on all five seeded PRs. Each concrete issue reached at least requirements in the later cohort, and the vague issue stopped to request an example. GitHub rejected the next dispatch with HTTP 422 even though repository Actions permissions show enabled and the workflows show active. GitHub later accepted the restored #3 demo run. The ledger tracks its outcome alongside the earlier attempts. [Run ledger](results/runs.md) · [GitHub Actions settings guidance](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository)
+The hosted reviewer experiment finished on all five seeded PRs. Each concrete issue reached at least requirements in the later cohort, and the vague issue stopped to request an example. GitHub rejected the next dispatch with HTTP 422 even though repository Actions permissions show enabled and the workflows show active. GitHub later accepted the restored #3 demo runs. The latest retry built a wheel and stopped at testing when the generated test file did not parse. The ledger links the attempts and their saved artifacts. [Run ledger](results/runs.md) · [GitHub Actions settings guidance](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository)
 
 ## AI assistance
 

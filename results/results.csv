@@ -12,3 +12,4 @@ F2,4,intake,44836037626,https://github.com/khush2520/mistune/actions/runs/448360
 F3,12,2cba295,44883878553,https://github.com/khush2520/mistune/actions/runs/44883878553,cancelled,pass,skipped,skipped,skipped,skipped,skipped,,,,,,,1613,Cancelled after the original issue #3 was restored.
 F1,3,2cba295,44884549837,https://github.com/khush2520/mistune/actions/runs/44884549837,failure,pass,pass,stop,skipped,skipped,skipped,,,,,,,10383,Replacement text for src/mistune/__main__.py must match exactly once.
 F1,3,f7875bd,44896544026,https://github.com/khush2520/mistune/actions/runs/44896544026,failure,pass,pass,stop,stop,skipped,skipped,,,,,,,14165,Proposed file src/mistune/__main__.py does not parse on line 115.
+F1,3,fbdccd7,44898264537,https://github.com/khush2520/mistune/actions/runs/44898264537,failure,pass,pass,pass,stop,skipped,skipped,,,,,,,15879,Proposed file tests/test_autose_issue.py does not parse on line 22.

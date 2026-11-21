@@ -234,7 +234,7 @@ def render():
             page.text(f"{live_review['case']} produced a tested PR with a posted {live_review['verdict'].replace('_', ' ')} verdict. "
                       "The run ledger links to the issue, CI and review.")
         else:
-            page.text("The initial model repeatedly requested details already given in the issue. The compact intake cleared four concrete issues on the next attempt. Subsequent gates stopped on model or test failures. GitHub rejected some dispatches with HTTP 422 and later accepted the restored F1 issue. The run ledger records the available release and review evidence.")
+            page.text("The initial model repeatedly requested details already given in the issue. The compact intake cleared four concrete issues on the next attempt. Subsequent gates stopped on model or test failures. After Actions resumed, the last F1 retry built a wheel but its generated Python tests did not parse. Release and review were skipped.")
         page.text(f"Qwen reported {tokens:,} tokens across the hosted issue and seeded-review runs. Total paid model spend was $0. "
                   "Timed-out and cancelled calls without reported usage are excluded from the token count.")
         page.finish()
