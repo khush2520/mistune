@@ -4,6 +4,8 @@ This assignment uses [khush2520/mistune](https://github.com/khush2520/mistune). 
 
 ## Run an issue
 
+Use [issue #12](https://github.com/khush2520/mistune/issues/12), the `-V` shortcut, for the next demo run. The active issue list and the two attempts on the original issue #3 are in the [run ledger](results/runs.md).
+
 1. On the fork, open an issue with the behavior you want and an example.
 2. As a repository maintainer, add the `autose` label or post exactly `/autose`.
 3. Open the [Actions tab](https://github.com/khush2520/mistune/actions/workflows/autose.yml). Start with `spec.md`, then check `design.md`, `diff.patch` and `test_report.md`. If release succeeds, `pr.md` links to the PR and the CI run that checked its commit.
@@ -24,7 +26,7 @@ The workflow now runs Qwen2.5-Coder-7B-Instruct locally on the standard Actions 
 - [Architecture](architecture/views/components.md), [sequence](architecture/views/sequence.md), [stage map](architecture/views/stage-map.md) and [decisions](architecture/decisions/)
 - [Issue texts](experiment/issues/), [seeded cases](experiment/seeded_prs/) and [experiment variants](experiment/variants.md)
 - [Run ledger](results/runs.md) and [hosted results](results/results.csv)
-- [Demo video](demo.mp4) shows the F1 local verification and the hosted seeded-review run.
+- [Demo video](demo.mp4) records the earlier F1 local verification and the hosted seeded-review run.
 
 Repeat the local decision probes with Docker running.
 

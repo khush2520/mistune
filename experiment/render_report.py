@@ -135,14 +135,14 @@ def render():
                   "The review job has Contents read. Its publisher can post a review. Generated code runs in an offline container with a product-only source tree.")
         page.finish()
 
-        page.page("What runs, in order", "Architecture views 2 and 3 · F1 sequence and artifact hand-offs")
+        page.page("What runs, in order", "Architecture views 2 and 3 · Recorded sequence and artifact hand-offs")
         if live_review:
             page.heading(f"Recorded hosted run · {live_review['case']}")
             page.text(f"GitHub Actions run {live_review['run_id']} took the issue through requirements, "
                       "design, implementation and testing. The release job pushed the checked patch and waited on same-head CI. "
                       f"The independent review posted its verdict on the pull request.")
         else:
-            page.heading("Recorded local run · F1")
+            page.heading("Recorded local run · original F1")
             page.text("The first wheel built but the new test failed because the CLI still wrote to the dash file. "
                       "The retry fixed the condition. A fresh reviewer context requested an independent build and tests. "
                       "The view records a local scripted run while the hosted trials are tracked in the ledger.")
@@ -212,7 +212,7 @@ def render():
         page.text("Keep the evidence gate. The five cases did not justify a model or prompt change. A focused regression check would provide more targeted evidence than a passing baseline alone.")
         page.finish()
 
-        page.page("Results", "Latest hosted attempt per issue and the independent evaluator")
+        page.page("Results", "Recorded hosted cohort and independent held-out checks")
         page.table(["Stage", "Passed / reached", "Check"], [
             (stage, rate, note) for (stage, rate), note in zip(rates, [
                 "Testable spec ready to hand off",
@@ -227,6 +227,7 @@ def render():
         page.text("The pinned baseline passed 1,327 tests and 158 subtests. The local F1 candidate passed all three hidden cases. "
                   "The V1 hidden checks evaluate the requirements artifact because an ambiguous issue should stop before release.")
         page.text("Hosted hidden scores were recorded as follows. " + (hidden or "No held-out score was available when this report was generated."))
+        page.text("Issue #12 (F3) replaces F1 for the next demo. The new version-flag tests passed 1/3 on the pinned baseline and 3/3 against a temporary reference. No hosted result has been recorded for F3.")
         page.heading("Hosted observations")
         if live_review:
             page.text(f"{live_review['case']} produced a tested PR with a posted {live_review['verdict'].replace('_', ' ')} verdict. "
@@ -243,7 +244,7 @@ def render():
                   "but each larger source file increases the input and output budget. A smaller verified change format could make multi-file work feasible without giving the model shell access.")
         page.heading("Limitations")
         page.text("1. One repository and four small product tasks. The current scope excludes changes to dependencies and workflow configuration, so these results do not predict performance on large changes.")
-        page.text("2. The local gate experiments use scripted responses. The hosted cohort tests live model behavior on five code changes. Those results have different denominators.")
+        page.text("2. The local gate experiments use scripted responses. The hosted cohort measures live model behavior on the original five issues. The replacement F3 has no hosted result.")
         page.text("3. The fixture author also supplied the expected labels. Seeded issues emphasize cases the author anticipated. Independent labeling would reduce this bias.")
         page.text("4. Structural checks can be satisfied by weak assertions. Test mappings and a valid line reference still need behavior-based review.")
         page.text("5. Docker verification used a local Apple Silicon machine. Hosted runner setup, token permissions and service latency can affect a live run.")

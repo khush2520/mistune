@@ -17,7 +17,8 @@ def issue_for(case):
     issue = ISSUES[case]
     if issue == "refactor":
         return {"title": "Simplify CLI output branching", "body": "Use a guard clause while preserving file and stdout behavior."}
-    title, body = (ROOT / "experiment" / "issues" / f"{issue}.md").read_text().split("\n\n", 1)
+    folder = "historical_issues" if issue == "F1" else "issues"
+    title, body = (ROOT / "experiment" / folder / f"{issue}.md").read_text().split("\n\n", 1)
     return {"title": title.removeprefix("# "), "body": body.strip()}
 
 

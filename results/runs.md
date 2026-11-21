@@ -3,14 +3,28 @@
 Hosted model inference ran on free public GitHub Actions runners using Qwen2.5-Coder-7B-Instruct.
 These links include stopped attempts. A vague issue stopping with actionable questions is an expected result.
 
+## Active issue set
+
+| Case | Issue | Role |
+| --- | --- | --- |
+| B1 | [#1](https://github.com/khush2520/mistune/issues/1) | Bug report |
+| B2 | [#2](https://github.com/khush2520/mistune/issues/2) | Bug report |
+| F2 | [#4](https://github.com/khush2520/mistune/issues/4) | Feature request |
+| F3 | [#12](https://github.com/khush2520/mistune/issues/12) | CLI version shortcut and next demo input |
+| V1 | [#5](https://github.com/khush2520/mistune/issues/5) | Vague request |
+
+F3 replaced the original stdout-dash issue F1 after the hosted cohort below. F1's issue text, two runs, and reviewer fixtures stay linked here. No hosted result has been recorded for F3.
+
+## Recorded issue runs
+
 | Case | Issue | Attempt | Actions | PR | CI | Posted review |
 | --- | --- | --- | --- | --- | --- | --- |
 | B1 | [#1](https://github.com/khush2520/mistune/issues/1) | initial | [initial · failure](https://github.com/khush2520/mistune/actions/runs/44779316915) | — | — | — |
 | B1 | [#1](https://github.com/khush2520/mistune/issues/1) | intake | [intake · failure](https://github.com/khush2520/mistune/actions/runs/44836026889) | — | — | — |
 | B2 | [#2](https://github.com/khush2520/mistune/issues/2) | initial | [initial · failure](https://github.com/khush2520/mistune/actions/runs/44779323217) | — | — | — |
 | B2 | [#2](https://github.com/khush2520/mistune/issues/2) | intake | [intake · failure](https://github.com/khush2520/mistune/actions/runs/44836031767) | — | — | — |
-| F1 | [#3](https://github.com/khush2520/mistune/issues/3) | initial | [initial · failure](https://github.com/khush2520/mistune/actions/runs/44779300733) | — | — | — |
-| F1 | [#3](https://github.com/khush2520/mistune/issues/3) | intake | [intake · failure](https://github.com/khush2520/mistune/actions/runs/44836017315) | — | — | — |
+| F1 (retired) | [#3](https://github.com/khush2520/mistune/issues/3) | initial | [initial · failure](https://github.com/khush2520/mistune/actions/runs/44779300733) | — | — | — |
+| F1 (retired) | [#3](https://github.com/khush2520/mistune/issues/3) | intake | [intake · failure](https://github.com/khush2520/mistune/actions/runs/44836017315) | — | — | — |
 | F2 | [#4](https://github.com/khush2520/mistune/issues/4) | initial | [initial · failure](https://github.com/khush2520/mistune/actions/runs/44779329122) | — | — | — |
 | F2 | [#4](https://github.com/khush2520/mistune/issues/4) | intake | [intake · failure](https://github.com/khush2520/mistune/actions/runs/44836037626) | — | — | — |
 | V1 | [#5](https://github.com/khush2520/mistune/issues/5) | initial | [initial · failure](https://github.com/khush2520/mistune/actions/runs/44779310092) | — | — | — |

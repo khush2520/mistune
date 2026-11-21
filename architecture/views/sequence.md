@@ -1,6 +1,6 @@
 # Sequence view
 
-The diagram shows the local F1 probe. It uses authored model responses and the same checks as the workflow. The hosted issue, Actions run and review links belong in the [run ledger](../../results/runs.md).
+The diagram shows the local F1 probe, which used authored model responses and the same checks as the workflow. F1 is now a historical case. Issue #12, the F3 CLI version shortcut, is the next hosted demo input. [Run ledger](../../results/runs.md)
 
 ```mermaid
 sequenceDiagram

@@ -71,6 +71,8 @@ def gate_experiment(repo, evidence):
 
 def issue_message(case):
     filename = ROOT / "experiment" / "issues" / f"{case}.md"
+    if case == "F1":
+        filename = ROOT / "experiment" / "historical_issues" / filename.name
     if filename.exists():
         title, body = filename.read_text().split("\n\n", 1)
         return {"number": 1, "title": title.removeprefix("# "), "body": body.strip()}
