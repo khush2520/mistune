@@ -310,6 +310,7 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
         cli_extra = ""
         if "src/mistune/__main__.py" in allowed:
             cli_extra = "\n\n" + (HERE / "prompts/cli-testing.md").read_text(encoding="utf-8")
+        original_conditions = {}
         for attempt in (1, 2):
             stage = "Implementation"
             try:
@@ -328,6 +329,7 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                             "path": target["path"], "line": conditions[0].lineno,
                             "condition": ast.get_source_segment(source[target["path"]], conditions[0].test),
                         }
+                        original_conditions.setdefault(target["path"], single_condition["condition"])
                 implementation_data = {
                     "issue": issue, "spec": spec, "design": plan, "current_files": {
                         name: "\n".join(f"{number}: {line}" for number, line in enumerate(content.splitlines(), 1))
@@ -339,10 +341,20 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                     result = model.ask("condition", {
                         "issue": issue, "function": ast.get_source_segment(source[target["path"]], function),
                         "current_condition": single_condition["condition"], "previous_failure": feedback,
+                        "original_condition": original_conditions[target["path"]],
                     })
                 else:
                     result = model.ask("implementation", implementation_data)
                 dump(directory / f"implementation-{attempt}.json", result)
+                if "else_values" in result and single_condition:
+                    values = result["else_values"]
+                    original = original_conditions[target["path"]]
+                    operand = ast.parse(original, mode="eval").body
+                    if (not isinstance(operand, (ast.Name, ast.Attribute)) or not isinstance(values, list)
+                            or not 1 <= len(values) <= 4
+                            or any(not isinstance(value, str) or len(value) > 80 for value in values)):
+                        raise Stop("Routing values need an atomic condition and one to four short strings.")
+                    result = {"expression": f"({original}) and ({original} not in {values!r})"}
                 if "expression" in result and single_condition:
                     result = {"condition_edits": [{**single_condition, "expression": result["expression"]}]}
                 apply_files(repo, result, SOURCE, allowed)
@@ -365,8 +377,9 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                 }
                 if cli_extra:
                     result = model.ask("cli-testing", {
-                        "issue": issue, "criterion_ids": criteria, "previous_failure": feedback,
-                        "candidate_source": testing_data["current_sources"],
+                        "issue": issue, "acceptance_criteria": [
+                            {"id": entry["id"], "evidence": entry["evidence"]} for entry in spec["criteria"]
+                        ], "previous_failure": feedback,
                     })
                 else:
                     result = model.ask("testing", testing_data)
