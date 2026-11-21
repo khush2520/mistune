@@ -98,8 +98,39 @@ def design(data, repo, index, directory):
     return allowed
 
 
+def line_replacements(repo, edits, pattern, allowed):
+    grouped = {}
+    for edit in objects(edits, "line edits", maximum=8):
+        name = string(edit.get("path"), "edit path", 150)
+        if not pattern.fullmatch(name) or (allowed is not None and name not in allowed):
+            raise Stop("A model proposed an edit outside this stage's allowlist.")
+        start, end, replacement = edit.get("start"), edit.get("end"), edit.get("replacement")
+        if type(start) is not int or type(end) is not int or not isinstance(replacement, str):
+            raise Stop(f"A line edit in {name} needs integer bounds and replacement text.")
+        grouped.setdefault(name, []).append((start, end, replacement))
+    files = {}
+    for name, changes in grouped.items():
+        path = safe_path(repo, name)
+        if not path.is_file():
+            if len(changes) != 1 or changes[0][:2] != (0, 0):
+                raise Stop(f"A new file needs one edit with start and end set to zero: {name}.")
+            files[name] = changes[0][2]
+            continue
+        lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+        next_start = len(lines) + 1
+        for start, end, replacement in sorted(changes, reverse=True):
+            if not 1 <= start <= end < next_start:
+                raise Stop(f"Line range {start} through {end} overlaps or is outside {name}.")
+            lines[start - 1:end] = [replacement.rstrip("\n") + "\n"] if replacement else []
+            next_start = start
+        files[name] = "".join(lines)
+    return files
+
+
 def apply_files(repo, result, pattern, allowed=None):
     files = result.get("files")
+    if "line_edits" in result:
+        files = line_replacements(repo, result["line_edits"], pattern, allowed)
     if "edits" in result:
         files = {}
         for edit in objects(result["edits"], "edits", maximum=8):
@@ -239,7 +270,10 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                 if any((repo / path).exists() and path not in source for path in allowed):
                     raise Stop("A target file exceeded the implementation context limit.")
                 result = model.ask("implementation", {
-                    "spec": spec, "design": plan, "current_files": source,
+                    "spec": spec, "design": plan, "current_files": {
+                        name: "\n".join(f"{number}: {line}" for number, line in enumerate(content.splitlines(), 1))
+                        for name, content in source.items()
+                    },
                     "previous_failure": feedback, "review_feedback": review,
                 })
                 apply_files(repo, result, SOURCE, allowed)

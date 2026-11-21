@@ -1,0 +1,53 @@
+{
+  "status": "ready",
+  "summary": "Ensure CLI output is sent to stdout with --output -",
+  "actors": [
+    "User"
+  ],
+  "constraints": [
+    "The `--output -` option should send the result to stdout",
+    "Other filenames should still work",
+    "A file already called `-` should be left alone"
+  ],
+  "assumptions": [
+    "The current behavior writes a file called `-` instead of sending to stdout",
+    "The normal stdout format is consistent and expected"
+  ],
+  "questions": [],
+  "criteria": [
+    {
+      "id": "AC-01",
+      "requirement": "FR-01",
+      "evidence": "Our wrapper expects `--output -` to send the result down a pipeline.",
+      "provenance": "inferred",
+      "given": "The user runs the command with `--output -`",
+      "when": "The command is executed",
+      "then": "The output is sent to stdout"
+    },
+    {
+      "id": "AC-02",
+      "requirement": "FR-02",
+      "evidence": "Other filenames should still work",
+      "provenance": "inferred",
+      "given": "The user runs the command with a filename other than `-`",
+      "when": "The command is executed",
+      "then": "The output is written to the specified file"
+    },
+    {
+      "id": "AC-03",
+      "requirement": "FR-03",
+      "evidence": "A file already called `-` should be left alone",
+      "provenance": "inferred",
+      "given": "The user runs the command with a file already named `-`",
+      "when": "The command is executed",
+      "then": "The output is written to the file `-`"
+    }
+  ],
+  "checks": {
+    "completeness": true,
+    "consistency": true,
+    "traceability": true,
+    "feasibility": true,
+    "testability": true
+  }
+}

@@ -30,6 +30,7 @@ The original F1 issue is active again. The temporary replacement F3 was closed a
 | V1 | [#5](https://github.com/khush2520/mistune/issues/5) | initial | [initial · failure](https://github.com/khush2520/mistune/actions/runs/44779310092) | — | — | — |
 | V1 | [#5](https://github.com/khush2520/mistune/issues/5) | intake | [intake · failure](https://github.com/khush2520/mistune/actions/runs/44836022294) | — | — | — |
 | F3 (retired) | [#12](https://github.com/khush2520/mistune/issues/12) | 2cba295 | [2cba295 · cancelled](https://github.com/khush2520/mistune/actions/runs/44883878553) | — | — | — |
+| F1 | [#3](https://github.com/khush2520/mistune/issues/3) | 2cba295 | [2cba295 · failure](https://github.com/khush2520/mistune/actions/runs/44884549837) | — | — | — |
 
 [Hosted issue results](results.csv) · [Local decision probes](local-probes.csv) · [Hidden baseline scores](hidden-scores.md)
 
