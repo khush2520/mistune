@@ -316,13 +316,34 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                 source = read_files(repo, [*sorted(allowed), *plan["context"]], limit=26_000)
                 if any((repo / path).exists() and path not in source for path in allowed):
                     raise Stop("A target file exceeded the implementation context limit.")
+                single_condition = None
+                if len(plan["targets"]) == 1:
+                    target = plan["targets"][0]
+                    tree = ast.parse(source[target["path"]])
+                    function = next((node for node in tree.body if isinstance(node, ast.FunctionDef)
+                                     and node.name == target["symbol"]), None)
+                    conditions = [node for node in function.body if isinstance(node, ast.If)] if function else []
+                    if len(conditions) == 1:
+                        single_condition = {
+                            "path": target["path"], "line": conditions[0].lineno,
+                            "condition": ast.get_source_segment(source[target["path"]], conditions[0].test),
+                        }
+                extra = ""
+                if single_condition:
+                    extra = ('\n\nThe selected function has one top-level if. The runner will select it. '
+                             'For this call return only {"expression":"the desired Python condition"}. '
+                             'Preserve the true branch for ordinary inputs and the else branch for the requested special input. '
+                             'The current condition is ' + single_condition["condition"] + '.')
                 result = model.ask("implementation", {
                     "issue": issue, "spec": spec, "design": plan, "current_files": {
                         name: "\n".join(f"{number}: {line}" for number, line in enumerate(content.splitlines(), 1))
                         for name, content in source.items()
                     },
                     "previous_failure": feedback, "review_feedback": review,
-                })
+                }, extra=extra)
+                dump(directory / f"implementation-{attempt}.json", result)
+                if "expression" in result and single_condition:
+                    result = {"condition_edits": [{**single_condition, "expression": result["expression"]}]}
                 apply_files(repo, result, SOURCE, allowed)
                 for target in plan["targets"]:
                     path = repo / target["path"]
@@ -341,6 +362,7 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                     "current_sources": read_files(repo, sorted(allowed), limit=21_000),
                     "current_tests": read_files(repo, test_names, limit=12_000),
                 }, extra=cli_extra)
+                dump(directory / f"testing-{attempt}.json", result)
                 if "cli_cases" in result:
                     result = {"files": {"tests/test_autose_issue.py": compile_cases(result["cli_cases"], criteria)}}
                 elif "test_code" in result:
