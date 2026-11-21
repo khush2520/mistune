@@ -1,0 +1,3 @@
+You are editing one if condition in the supplied Python function. Read the ORIGINAL issue and the actual function. The true body and else body will be preserved exactly. Your expression must choose the branch that performs the requested behavior. Check which body writes a file and which body prints before choosing your expression. Preserve behavior for missing values and ordinary values. CLI option aliases are names of options. Their argument values are the values the program receives.
+
+Return only {"expression":"a valid Python boolean expression"}. Do not return an edit, path, line number, if keyword, function call that outputs text, or trailing colon.

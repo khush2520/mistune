@@ -20,6 +20,7 @@ SHA = re.compile(r"[0-9a-f]{40}")
 MAX_FILE_BYTES = 45_000
 MAX_REQUEST_BYTES = 50_000
 OUTPUT_TOKENS = {"requirements": 1450, "design": 1200, "implementation": 2400,
+                 "condition": 250, "cli-testing": 1800,
                  "testing": 2400, "review": 1200, "inspect": 250}
 
 
@@ -166,6 +167,9 @@ class Model:
         self.calls += 1
         if self.fixtures is not None:
             path = self.fixtures / f"{self.calls:02d}-{role}.json"
+            if not path.is_file() and role in {"condition", "cli-testing"}:
+                fixture_role = {"condition": "implementation", "cli-testing": "testing"}[role]
+                path = self.fixtures / f"{self.calls:02d}-{fixture_role}.json"
             if not path.is_file():
                 raise Stop(f"Local fixture missing for call {self.calls} ({role}).")
             return load(path)
@@ -182,7 +186,7 @@ class Model:
             "temperature": 0.0,
             "max_tokens": OUTPUT_TOKENS[role],
             "response_format": (
-                {"type": "json_object"} if role in {"requirements", "design", "implementation", "testing"}
+                {"type": "json_object"} if role in {"requirements", "design", "implementation", "testing", "condition", "cli-testing"}
                 else {"type": "json_object", "schema": SCHEMAS[role]}
             ),
             "messages": [
