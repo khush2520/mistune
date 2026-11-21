@@ -146,9 +146,11 @@ def condition_replacements(repo, edits, pattern, allowed):
         except SyntaxError:
             raise Stop("A replacement condition must be a valid Python expression.") from None
         matches = [node.test for node in ast.walk(ast.parse(original))
-                   if isinstance(node, ast.If) and node.lineno == edit.get("line")]
+                   if isinstance(node, ast.If) and (
+                       ast.get_source_segment(original, node.test) == edit["condition"]
+                       if "condition" in edit else node.lineno == edit.get("line"))]
         if len(matches) != 1 or matches[0].lineno != matches[0].end_lineno:
-            raise Stop(f"Expected one single-line if condition on line {edit.get('line')} of {name}.")
+            raise Stop(f"Expected exactly one matching single-line if condition in {name}.")
         test = matches[0]
         lines = original.splitlines(keepends=True)
         line = lines[test.lineno - 1].encode()
