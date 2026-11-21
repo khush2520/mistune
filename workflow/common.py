@@ -186,7 +186,7 @@ class Model:
             "temperature": 0.0,
             "max_tokens": OUTPUT_TOKENS[role],
             "response_format": (
-                {"type": "json_object"} if role in {"requirements", "design", "implementation", "testing", "condition", "cli-testing"}
+                {"type": "json_object"} if role in {"requirements", "design", "implementation", "testing", "condition"}
                 else {"type": "json_object", "schema": SCHEMAS[role]}
             ),
             "messages": [

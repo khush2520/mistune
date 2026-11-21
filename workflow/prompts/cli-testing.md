@@ -1,8 +1,10 @@
-For this CLI change, return cli_cases instead of test_code. Each case invokes python -m mistune in its own temporary directory and checks for exit code zero. Use the exact flags and file behavior requested in the original issue. If a flag has two requested aliases, exercise both in separate cases with the same criterion ID. Where the request says to leave an existing file alone, set its before and after fields to the same text.
+Choose CLI tests for every acceptance criterion using the original issue and the evidence associated with each ID. Return scenarios matching the supplied JSON schema.
 
-The original issue defines the desired behavior. Each acceptance_criteria entry gives its ID and evidence. Test that evidence using that ID. An existing file being left alone means its contents stay exactly the same. Do not append rendered text to it. Use ["-m","hello"] in every case and add only the option being tested. Tests run in an empty directory. Never reference README.md or use -f for an output-option issue. Mistune renders hello to "<p>hello</p>\n". Normal stdout adds one final newline to that rendered text, so its exact output is "<p>hello</p>\n\n". A normal output file contains "<p>hello</p>\n". Prefer same_stdout_as to compare exact stdout with the usual command.
+Every scenario has id, args, markdown, filename, and mode. Use markdown "hello" and begin args with ["-m","hello"]. Add the exact option and value that exercise the criterion. Each argument is a separate string. Do not use -f or reference existing repository files.
 
-JSON example for a CLI option that leaves normal stdout unchanged:
-{"cli_cases":[{"id":"AC-01","args":["-m","## Example","--example-flag"],"same_stdout_as":["-m","## Example"]}]}
+Choose one assertion mode per scenario.
+- stdout compares the command's exact stdout with the ordinary command for the same Markdown. Set filename to an empty string.
+- output_file asserts empty stdout and a named file containing the normal rendered Markdown, using the public renderer as an oracle. Set filename to that output filename.
+- preserve_file creates a named file with sentinel contents, executes the command, checks the file remains unchanged, and checks exact normal stdout. Set filename to the file the issue says to leave alone.
 
-Each case has id and args. Use stdout for exact expected stdout or same_stdout_as for the argument list of an existing command whose nonempty stdout must match exactly. For a filesystem assertion, supply file with name (a basename), optional before (initial file contents), and after (expected exact file contents, or null if no file should exist). Test a real small Markdown input. Multiple cases may use the same criterion ID.
+Do not write Python or expected HTML. Select modes, option arguments and filenames that test the user's requested behavior. Cover both requested option aliases. The output object has only scenarios.

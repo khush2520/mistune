@@ -10,7 +10,7 @@ from common import (
     HERE, MAX_FILE_BYTES, SOURCE, TEST, Model, Stop, dump, git, load, markdown,
     objects, read_files, safe_path, string, symbols, tracked,
 )
-from cli_cases import compile_cases
+from cli_cases import compile_cases, compile_scenarios
 from sandbox import check
 
 AC = re.compile(r"AC-\d{2}")
@@ -311,8 +311,10 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
         if "src/mistune/__main__.py" in allowed:
             cli_extra = "\n\n" + (HERE / "prompts/cli-testing.md").read_text(encoding="utf-8")
         original_conditions = {}
+        repair_tests_only = False
         for attempt in (1, 2):
             stage = "Implementation"
+            executed_tests = False
             try:
                 source = read_files(repo, [*sorted(allowed), *plan["context"]], limit=26_000)
                 if any((repo / path).exists() and path not in source for path in allowed):
@@ -337,7 +339,9 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                     },
                     "previous_failure": feedback, "review_feedback": review,
                 }
-                if single_condition:
+                if repair_tests_only:
+                    result = {"files": {}}
+                elif single_condition:
                     result = model.ask("condition", {
                         "issue": issue, "function": ast.get_source_segment(source[target["path"]], function),
                         "current_condition": single_condition["condition"], "previous_failure": feedback,
@@ -384,12 +388,15 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                 else:
                     result = model.ask("testing", testing_data)
                 dump(directory / f"testing-{attempt}.json", result)
-                if "cli_cases" in result:
+                if "scenarios" in result:
+                    result = {"files": {"tests/test_autose_issue.py": compile_scenarios(result["scenarios"], criteria)}}
+                elif "cli_cases" in result:
                     result = {"files": {"tests/test_autose_issue.py": compile_cases(result["cli_cases"], criteria)}}
                 elif "test_code" in result:
                     result = {"files": {"tests/test_autose_issue.py": result["test_code"]}}
                 apply_files(repo, result, TEST)
                 mapping = mapped_tests(repo, criteria)
+                executed_tests = True
                 report = checker(repo, "test")
                 (directory / f"pytest-{attempt}.txt").write_text(report["log"], encoding="utf-8")
                 confirm_results(report, mapping)
@@ -406,6 +413,7 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                 dump(directory / "build_status.json", {"status": "passed", "attempt": attempt})
                 return
             except Stop as error:
+                repair_tests_only = stage == "Testing" and not executed_tests
                 feedback = str(error)
                 logfile = directory / (f"build-{attempt}.txt" if stage == "Implementation" else f"pytest-{attempt}.txt")
                 if logfile.exists():
