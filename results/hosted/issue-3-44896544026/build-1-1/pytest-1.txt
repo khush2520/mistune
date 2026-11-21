@@ -1,0 +1,72 @@
+FFFFF................................................................... [  5%]
+...................................................................... [ 10%]
+........................................................................ [ 16%]
+........................................................................ [ 21%]
+........................................................................ [ 26%]
+........................................................................ [ 32%]
+........................................................................ [ 37%]
+........................................................................ [ 43%]
+........................................................................ [ 48%]
+........................................................................ [ 53%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+.................................................................... [ 69%]
+........................................................................ [ 75%]
+........................................................................ [ 80%]
+........................................................................ [ 86%]
+........................................................................ [ 91%]
+................................................................ [ 96%]
+................................................                         [100%]
+=================================== FAILURES ===================================
+__________________________________ test_ac_01 __________________________________
+tests/test_autose_issue.py:19: in test_ac_01
+    cli()
+src/mistune/__main__.py:108: in cli
+    sys.stdout.write(text)
+                     ^^^^
+E   UnboundLocalError: cannot access local variable 'text' where it is not associated with a value
+__________________________________ test_ac_02 __________________________________
+tests/test_autose_issue.py:32: in test_ac_02
+    cli()
+src/mistune/__main__.py:111: in cli
+    f.write(text)
+            ^^^^
+E   UnboundLocalError: cannot access local variable 'text' where it is not associated with a value
+__________________________________ test_ac_03 __________________________________
+tests/test_autose_issue.py:43: in test_ac_03
+    cli()
+src/mistune/__main__.py:108: in cli
+    sys.stdout.write(text)
+                     ^^^^
+E   UnboundLocalError: cannot access local variable 'text' where it is not associated with a value
+_____________________ TestCliMessage.test_command_line_001 _____________________
+tests/__init__.py:13: in method
+    self.assert_case(n, text, html)
+tests/__init__.py:33: in assert_case
+    result = self.parse(text)
+             ^^^^^^^^^^^^^^^^
+tests/test_cli.py:15: in parse
+    cli()
+src/mistune/__main__.py:110: in cli
+    with open(args.output, "w", encoding="utf-8") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: expected str, bytes or os.PathLike object, not NoneType
+_____________________ TestCliMessage.test_command_line_002 _____________________
+tests/__init__.py:13: in method
+    self.assert_case(n, text, html)
+tests/__init__.py:33: in assert_case
+    result = self.parse(text)
+             ^^^^^^^^^^^^^^^^
+tests/test_cli.py:15: in parse
+    cli()
+src/mistune/__main__.py:110: in cli
+    with open(args.output, "w", encoding="utf-8") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: expected str, bytes or os.PathLike object, not NoneType
+=========================== short test summary info ============================
+FAILED tests/test_autose_issue.py::test_ac_01 - UnboundLocalError: cannot acc...
+FAILED tests/test_autose_issue.py::test_ac_02 - UnboundLocalError: cannot acc...
+FAILED tests/test_autose_issue.py::test_ac_03 - UnboundLocalError: cannot acc...
+FAILED tests/test_cli.py::TestCliMessage::test_command_line_001 - TypeError: ...
+FAILED tests/test_cli.py::TestCliMessage::test_command_line_002 - TypeError: ...
+5 failed, 1325 passed, 158 subtests passed in 5.40s

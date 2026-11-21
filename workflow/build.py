@@ -211,14 +211,21 @@ def issue_source_matches(repo, issue, paths):
     text = str(issue.get("title", "")) + "\n" + str(issue.get("body", ""))
     flags = re.findall(r"(?<![\w-])--[a-z][a-z0-9-]+", text)
     references = re.findall(r"`((?:[A-Za-z_]\w*\.)*[A-Za-z_]\w*)`", text)
-    terms = list(dict.fromkeys([*flags, *(name.rsplit(".", 1)[-1] for name in references)]))[:8]
+    arguments = ["args." + flag[2:].replace("-", "_") for flag in flags]
+    terms = list(dict.fromkeys([*flags, *arguments, *(name.rsplit(".", 1)[-1] for name in references)]))[:8]
     matches = {}
     for name in paths:
         source = safe_path(repo, name).read_text(encoding="utf-8")
-        lines = [f"{i}: {line.strip()}" for i, line in enumerate(source.splitlines(), 1)
+        lines = [(i, line.strip()) for i, line in enumerate(source.splitlines(), 1)
                  if any(term in line for term in terms)]
         if lines:
-            matches[name] = lines[:4]
+            functions = [node for node in ast.walk(ast.parse(source))
+                         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))]
+            functions.sort(key=lambda node: node.end_lineno - node.lineno)
+            matches[name] = []
+            for number, line in lines[:6]:
+                owner = next((node.name for node in functions if node.lineno <= number <= node.end_lineno), "module")
+                matches[name].append(f"{number} ({owner}): {line}")
         if len(matches) == 6:
             break
     return matches
