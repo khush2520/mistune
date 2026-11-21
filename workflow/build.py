@@ -178,6 +178,13 @@ def stage_error(directory, stage, reason):
     dump(directory / "build_status.json", {"status": "failed", "stage": stage, "reason": reason})
 
 
+def architecture_context(repo):
+    architecture = (repo / "ARCHITECTURE.md").read_text(encoding="utf-8")
+    overview = architecture.split("## 2. Architecture", 1)[0]
+    constraints = architecture.split("## 3. Constraints", 1)[1]
+    return overview + "\n## 3. Constraints" + constraints
+
+
 def a1_rules():
     skill = (HERE / "prompts/a1-skill.md").read_text(encoding="utf-8")
     acceptance = skill.split("### 3.3 Testability", 1)[1].split("## 4.", 1)[0]
@@ -204,7 +211,9 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
         else:
             plan = model.ask("design", {
                 "issue": issue, "spec": spec, "review_feedback": review,
-                "architecture": (repo / "ARCHITECTURE.md").read_text(), "source_index": index,
+                "architecture": architecture_context(repo), "source_index": {
+                    path: names[:14] for path, names in index.items()
+                },
             })
         allowed = design(plan, repo, index, directory)
         feedback = ""
@@ -232,6 +241,8 @@ def run(repo, directory, issue, model, *, previous=None, review=None, checker=ch
                     "current_sources": read_files(repo, sorted(allowed), limit=21_000),
                     "current_tests": read_files(repo, test_names, limit=12_000),
                 })
+                if "test_code" in result:
+                    result = {"files": {"tests/test_autose_issue.py": result["test_code"]}}
                 apply_files(repo, result, TEST)
                 mapping = mapped_tests(repo, criteria)
                 report = checker(repo, "test")

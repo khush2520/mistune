@@ -170,13 +170,19 @@ class Model:
                 raise Stop(f"Local fixture missing for call {self.calls} ({role}).")
             return load(path)
         prompt = (HERE / "prompts" / f"{role}.md").read_text(encoding="utf-8")
-        message = json.dumps(data, ensure_ascii=False)
+        context = {key: value for key, value in data.items()
+                   if key not in {"current_files", "current_sources", "current_tests"}}
+        message = json.dumps(context, ensure_ascii=False)
+        for key in ("current_files", "current_sources", "current_tests"):
+            if key in data:
+                for name, content in data[key].items():
+                    message += f"\n\n--- {key} / {name} ---\n{content}"
         payload = {
             "model": MODEL,
             "temperature": 0.0,
             "max_tokens": OUTPUT_TOKENS[role],
             "response_format": (
-                {"type": "json_object"} if role == "requirements"
+                {"type": "json_object"} if role in {"requirements", "design", "implementation", "testing"}
                 else {"type": "json_object", "schema": SCHEMAS[role]}
             ),
             "messages": [
@@ -191,7 +197,7 @@ class Model:
         }
         if len(json.dumps(payload).encode()) > MAX_REQUEST_BYTES:
             raise Stop("The model request exceeded the input size limit.")
-        result = request(MODEL_ENDPOINT, None, "Local Qwen", payload, timeout=420)
+        result = request(MODEL_ENDPOINT, None, "Local Qwen", payload, timeout=660)
         self.history.append({"role": role, "model": result["model"], **result.get("usage", {})})
         dump(self.directory / "usage.json", self.history)
         choice = result["choices"][0]
