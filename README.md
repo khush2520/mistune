@@ -1,6 +1,8 @@
 # AutoSE 3 · Issue to reviewed pull request
 
-This assignment uses [khush2520/mistune](https://github.com/khush2520/mistune). Mistune is pinned to `f7ec702edfc1ad5579a76f881238841af266d93c`, the same baseline as A2. The first AutoSE commit, `02c859e`, records the architecture before the workflow code.
+[khush2520/ase-a3](https://github.com/khush2520/ase-a3) is the submission repository. The issue trials and reviewer experiments ran on the actual [Mistune fork](https://github.com/khush2520/mistune), where the issue, CI and review links resolve. Launch the workflow on that fork.
+
+The submission retains the pinned Mistune history at `f7ec702edfc1ad5579a76f881238841af266d93c`, the same baseline as A2. The first AutoSE commit, `02c859e`, records the architecture before the workflow code.
 
 ## Run an issue
 
